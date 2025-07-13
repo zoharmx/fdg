@@ -1,4 +1,3 @@
-# main.py
 import os
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
@@ -6,16 +5,24 @@ from pydantic import BaseModel
 import google.generativeai as genai
 from dotenv import load_dotenv
 
-# Carga la variable de entorno para desarrollo local
+# Carga la variable de entorno para desarrollo local (no afecta a producción)
 load_dotenv()
 
 # Configura la app de FastAPI
 app = FastAPI()
 
-# Configura CORS para permitir solicitudes desde tu frontend
+# --- CAMBIO IMPORTANTE PARA PRODUCCIÓN ---
+# Ahora solo permitimos solicitudes desde tu dominio oficial.
+origins = [
+    "https://fdgconstructions.site",
+    "http://fdgconstructions.site",
+    "https://www.fdgconstructions.site",
+    "http://www.fdgconstructions.site",
+]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"], # Para producción, reemplaza "*" con el dominio de tu sitio de Hostinger
+    allow_origins=origins, # Usamos la lista de orígenes permitidos
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -25,7 +32,7 @@ app.add_middleware(
 try:
     genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
 except Exception as e:
-    print(f"Error al configurar la API de Gemini: {e}")
+    print(f"Error configuring Gemini API: {e}")
 
 # Define el modelo de datos para la solicitud
 class PromptRequest(BaseModel):
@@ -34,15 +41,17 @@ class PromptRequest(BaseModel):
 @app.post("/api/generate")
 async def generate_content_route(request: PromptRequest):
     if not request.prompt:
-        raise HTTPException(status_code=400, detail="No se proporcionó un prompt.")
+        raise HTTPException(status_code=400, detail="No prompt provided.")
 
     try:
-        model = genai.GenerativeModel('gemini-1.5-pro') # Usamos el modelo PRO para el chat
+        # Usamos el modelo Pro para la mejor calidad de conversación
+        model = genai.GenerativeModel('gemini-1.5-pro') 
         response = model.generate_content(request.prompt)
         return {"text": response.text}
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error al generar contenido: {str(e)}")
+        # Devuelve un error más detallado para facilitar la depuración si algo falla
+        raise HTTPException(status_code=500, detail=f"Error generating content from Gemini: {str(e)}")
 
 @app.get("/")
 def read_root():
-    return {"status": "Backend de FDG Constructions está funcionando"}
+    return {"status": "FDG Constructions AI Backend is running"}
