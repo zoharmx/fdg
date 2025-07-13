@@ -1,0 +1,6 @@
+# Entorno de Python
+venv/
+__pycache__/
+
+# Archivo de secretos
+.env

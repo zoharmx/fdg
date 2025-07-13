@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FDG Constructions | Rediseño Conversacional de Proyectos en Dallas, TX</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- HubSpot Form Embed Script -->
+    <script charset="utf-8" type="text/javascript" src="//js.hsforms.net/forms/embed/v2.js"></script>
+
+    <style>
+        :root {
+            --primary-yellow: #FCD34D;
+            --primary-yellow-hover: #F59E0B;
+            --dark-bg: #0F0F0F;
+            --card-bg: #1A1A1A;
+            --border-color: #333333;
+            --text-primary: #FFFFFF;
+            --text-secondary: #A1A1AA;
+            --text-muted: #71717A;
+            --success-green: #10B981;
+            --error-red: #EF4444;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--dark-bg);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        /* --- UI/UX ENHANCEMENTS --- */
+
+        /* Botones Mejorados */
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-yellow), var(--primary-yellow-hover));
+            color: var(--dark-bg);
+            font-weight: 700;
+            padding: 16px 32px;
+            border-radius: 12px;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(252, 211, 77, 0.2);
+        }
+
+        .btn-primary:hover, .btn-primary:focus {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 8px 25px rgba(252, 211, 77, 0.3);
+            background: linear-gradient(135deg, var(--primary-yellow-hover), #D97706);
+        }
+
+        .btn-secondary {
+            background-color: transparent;
+            color: var(--text-primary);
+            font-weight: 600;
+            padding: 14px 28px;
+            border-radius: 12px;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            border: 2px solid var(--border-color);
+        }
+
+        .btn-secondary:hover, .btn-secondary:focus {
+            background-color: var(--border-color);
+            border-color: var(--primary-yellow);
+            transform: translateY(-2px);
+        }
+
+        /* Títulos de Sección */
+        .section-title {
+            position: relative;
+            font-size: clamp(2rem, 5vw, 2.5rem);
+            font-weight: 800;
+            text-align: center;
+            margin-bottom: 4rem;
+            background: linear-gradient(135deg, var(--text-primary), var(--text-secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-yellow), var(--primary-yellow-hover));
+            border-radius: 2px;
+        }
+
+        /* Animaciones de Scroll (Fade-in) */
+        .fade-in {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.6s cubic-bezier(0.645, 0.045, 0.355, 1), transform 0.6s cubic-bezier(0.645, 0.045, 0.355, 1);
+        }
+        .fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        /* Para efectos escalonados */
+        .delay-1 { transition-delay: 0.1s; }
+        .delay-2 { transition-delay: 0.2s; }
+        .delay-3 { transition-delay: 0.3s; }
+        .delay-4 { transition-delay: 0.4s; }
+
+        /* --- LAYOUTS DINÁMICOS --- */
+
+        /* Proceso Simplificado - Layout Mejorado */
+        .process-grid {
+            position: relative;
+        }
+        .process-connector {
+            position: absolute;
+            top: 60px;
+            left: 25%;
+            width: 50%;
+            height: 2px;
+            background: repeating-linear-gradient(90deg, var(--border-color), var(--border-color) 10px, transparent 10px, transparent 20px);
+            z-index: -1;
+        }
+        @media (max-width: 1024px) {
+            .process-connector { display: none; }
+        }
+
+        .process-step {
+            text-align: center;
+        }
+        .step-number {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--card-bg), #2a2a2a);
+            color: var(--primary-yellow);
+            border: 2px solid var(--primary-yellow);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: 800;
+            margin: 0 auto 1rem;
+            box-shadow: 0 0 20px rgba(252, 211, 77, 0.2);
+            transition: all 0.3s ease;
+        }
+        .process-step:hover .step-number {
+            background: linear-gradient(135deg, var(--primary-yellow), var(--primary-yellow-hover));
+            color: var(--dark-bg);
+            transform: scale(1.1);
+        }
+
+        /* Card Mejorada */
+        .card {
+            background: linear-gradient(145deg, var(--card-bg), #222222);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 24px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            height: 100%;
+        }
+        .card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.5);
+            border-color: var(--primary-yellow);
+        }
+
+        /* --- INTERFAZ DE CHAT CONVERSACIONAL --- */
+        .chat-container {
+            background: linear-gradient(145deg, var(--card-bg), #1F1F1F);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 24px;
+            min-height: 450px;
+            max-height: 600px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        @keyframes slide-in-left { from { opacity: 0; transform: translateX(-20px); } to { opacity: 1; transform: translateX(0); } }
+        @keyframes slide-in-right { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
+        @keyframes fade-in-bubble { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+
+        .chat-bubble {
+            padding: 16px 20px;
+            border-radius: 18px;
+            max-width: 85%;
+            word-wrap: break-word;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+            line-height: 1.5;
+        }
+
+        .chat-bubble-ai {
+            background: linear-gradient(135deg, #2A2A2A, #222222);
+            color: var(--text-primary);
+            border-radius: 18px 18px 18px 4px;
+            align-self: flex-start;
+            animation: slide-in-left 0.4s cubic-bezier(0.25, 0.8, 0.25, 1) forwards;
+        }
+
+        .chat-bubble-user {
+            background: linear-gradient(135deg, var(--primary-yellow), var(--primary-yellow-hover));
+            color: var(--dark-bg);
+            border-radius: 18px 18px 4px 18px;
+            align-self: flex-end;
+            font-weight: 500;
+            animation: slide-in-right 0.4s cubic-bezier(0.25, 0.8, 0.25, 1) forwards;
+        }
+        
+        .chat-options-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 12px;
+            animation: fade-in-bubble 0.5s 0.3s both;
+        }
+
+        .chat-option-button {
+            background-color: var(--card-bg);
+            color: var(--text-primary);
+            font-weight: 500;
+            padding: 10px 18px;
+            border-radius: 20px;
+            transition: all 0.2s ease;
+            border: 1px solid var(--border-color);
+            cursor: pointer;
+        }
+        .chat-option-button:hover {
+            background-color: var(--primary-yellow);
+            color: var(--dark-bg);
+            border-color: var(--primary-yellow);
+            transform: translateY(-2px);
+        }
+
+        .chat-input-container {
+            display: flex;
+            gap: 12px;
+            margin-top: 16px;
+            animation: fade-in-bubble 0.5s both;
+        }
+
+        .chat-input {
+            flex: 1;
+            background: var(--dark-bg);
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            padding: 16px;
+            color: var(--text-primary);
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+        .chat-input:focus {
+            outline: none;
+            border-color: var(--primary-yellow);
+            box-shadow: 0 0 0 3px rgba(252, 211, 77, 0.2);
+        }
+
+        /* Indicador de "Escribiendo..." */
+        .typing-indicator {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            padding: 16px 20px;
+        }
+        .typing-indicator span {
+            height: 8px;
+            width: 8px;
+            background-color: var(--text-muted);
+            border-radius: 50%;
+            animation: bounce 1.4s infinite ease-in-out both;
+        }
+        .typing-indicator span:nth-child(1) { animation-delay: -0.32s; }
+        .typing-indicator span:nth-child(2) { animation-delay: -0.16s; }
+        @keyframes bounce {
+            0%, 80%, 100% { transform: scale(0); }
+            40% { transform: scale(1.0); }
+        }
+
+        /* Hero section */
+        .hero-title {
+            font-size: clamp(2.5rem, 6vw, 4.5rem);
+            font-weight: 900;
+            line-height: 1.1;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(135deg, var(--text-primary), var(--text-secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero-subtitle {
+            font-size: clamp(1.1rem, 2vw, 1.25rem);
+            color: var(--text-secondary);
+            max-width: 650px;
+            margin: 0 auto 2.5rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <!-- Header -->
+        <header class="flex justify-between items-center py-6">
+            <div class="flex items-center">
+                <img src="https://assets.zyrosite.com/m5Knj89BR2SZrPKo/gemini_generated_image_e4n83ye4n83ye4n8-Awv9QajMVNHOOVOe.png" alt="FDG Constructions Logo" class="h-12 md:h-16">
+            </div>
+            <a href="tel:+14304445162" class="btn-primary hidden sm:inline-block">
+                📞 Llamar Ahora
+            </a>
+        </header>
+
+        <main>
+            <!-- Hero Section -->
+            <section class="text-center py-20 md:py-28">
+                <div class="fade-in">
+                    <div class="inline-block px-4 py-2 bg-gradient-to-r from-yellow-400/10 to-yellow-600/10 border border-yellow-400/30 rounded-full mb-6">
+                        <span class="text-yellow-400 font-semibold text-sm">🏆 EXCLUSIVO PARA DALLAS, TX Y ALREDEDORES</span>
+                    </div>
+                    <h1 class="hero-title">
+                        La Forma Inteligente de Construir y Remodelar
+                    </h1>
+                    <p class="hero-subtitle">
+                        Conectamos tu visión con nuestra red de contratistas de élite. Olvídate de las complicaciones: nosotros gestionamos todo por ti.
+                    </p>
+                    <a href="#ai-planner" class="btn-primary text-xl">
+                        🚀 Iniciar Mi Plan de Proyecto
+                    </a>
+                </div>
+            </section>
+
+            <!-- AI Project Planner Section (NUEVO FORMULARIO CONVERSACIONAL) -->
+            <section id="ai-planner" class="py-20">
+                <div class="text-center mb-12 fade-in">
+                    <h2 class="section-title">Planificador de Proyectos con IA</h2>
+                    <p class="text-xl text-gray-400 max-w-3xl mx-auto">Nuestro asistente virtual te guiará paso a paso para definir tu proyecto. Es rápido, fácil y sin compromiso.</p>
+                </div>
+                
+                <div class="max-w-3xl mx-auto fade-in delay-1">
+                    <div class="chat-container" id="chat-container">
+                        <!-- La conversación se generará aquí con JavaScript -->
+                    </div>
+                    
+                    <div id="chat-input-area" class="chat-input-container hidden">
+                        <input type="text" id="chat-input" placeholder="Escribe tu respuesta aquí..." class="chat-input">
+                        <button id="send-chat-btn" class="btn-primary">Enviar</button>
+                    </div>
+                </div>
+                <!-- Contenedor oculto para el formulario de HubSpot -->
+                <div id="hubspot-form-container-hidden" class="hidden"></div>
+            </section>
+
+            <!-- How it Works Section -->
+            <section id="process" class="py-20">
+                <h2 class="section-title fade-in">Nuestro Proceso Simplificado</h2>
+                <div class="relative">
+                    <div class="process-connector hidden lg:block"></div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                        <div class="process-step fade-in delay-1">
+                            <div class="card">
+                                <div class="step-number">1</div>
+                                <h3 class="text-xl font-bold mb-3">Planifica con IA</h3>
+                                <p class="text-gray-400">Usa nuestro asistente para definir tu proyecto en minutos. Recopilamos todos los detalles importantes.</p>
+                            </div>
+                        </div>
+                        <div class="process-step fade-in delay-2">
+                            <div class="card">
+                                <div class="step-number">2</div>
+                                <h3 class="text-xl font-bold mb-3">Recibe tu Cotización</h3>
+                                <p class="text-gray-400">Nuestro equipo analiza tu plan y te envía una cotización detallada y transparente.</p>
+                            </div>
+                        </div>
+                        <div class="process-step fade-in delay-3">
+                            <div class="card">
+                                <div class="step-number">3</div>
+                                <h3 class="text-xl font-bold mb-3">Asignamos al Mejor</h3>
+                                <p class="text-gray-400">Te conectamos con el contratista más cualificado de nuestra red para tu proyecto específico.</p>
+                            </div>
+                        </div>
+                        <div class="process-step fade-in delay-4">
+                            <div class="card">
+                                <div class="step-number">4</div>
+                                <h3 class="text-xl font-bold mb-3">Construcción y Supervisión</h3>
+                                <p class="text-gray-400">Ejecución profesional con FDG supervisando la calidad, los plazos y la comunicación.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Value Proposition Section -->
+            <section id="benefits" class="py-20">
+                 <h2 class="section-title fade-in">¿Por Qué Elegir FDG Constructions?</h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <div class="card value-card fade-in delay-1">
+                        <div class="text-5xl mb-4">🛡️</div>
+                        <h3 class="text-xl font-bold mb-4">Contratistas Verificados</h3>
+                        <p class="text-gray-400">Cada profesional en nuestra red pasa por un riguroso proceso de selección, incluyendo licencias y revisiones de portafolio.</p>
+                    </div>
+                    <div class="card value-card fade-in delay-2">
+                        <div class="text-5xl mb-4">💰</div>
+                        <h3 class="text-xl font-bold mb-4">Precios Transparentes</h3>
+                        <p class="text-gray-400">Sin tarifas ocultas. Nuestras cotizaciones detallan materiales, mano de obra y nuestra tarifa de gestión desde el principio.</p>
+                    </div>
+                    <div class="card value-card fade-in delay-3">
+                        <div class="text-5xl mb-4">🔧</div>
+                        <h3 class="text-xl font-bold mb-4">Gestión Integral</h3>
+                        <p class="text-gray-400">Desde los permisos hasta la inspección final, manejamos cada aspecto de tu proyecto con un gestor dedicado.</p>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Footer -->
+        <footer class="text-center py-16 border-t border-gray-800">
+            <div class="mb-8">
+                <img src="https://assets.zyrosite.com/m5Knj89BR2SZrPKo/gemini_generated_image_e4n83ye4n83ye4n8-Awv9QajMVNHOOVOe.png" alt="FDG Constructions Logo" class="h-12 mx-auto">
+            </div>
+            <p class="text-gray-400 mb-6 text-lg">Tu socio estratégico en construcción y remodelación en Dallas, TX.</p>
+            <div class="flex justify-center items-center space-x-6 sm:space-x-8 mb-8">
+                <a href="tel:+14304445162" class="text-yellow-400 hover:text-yellow-300 transition-colors">📞 Llamar</a>
+                <a href="#ai-planner" class="btn-primary">🚀 Iniciar Plan</a>
+                <a href="mailto:contact@fdgconstructions.com" class="text-yellow-400 hover:text-yellow-300 transition-colors">✉️ Email</a>
+            </div>
+            <p class="text-gray-500 text-sm">© 2025 FDG Constructions LLC. Todos los derechos reservados.</p>
+        </footer>
+    </div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // --- ELEMENTOS DEL DOM ---
+        const chatContainer = document.getElementById('chat-container');
+        const chatInputArea = document.getElementById('chat-input-area');
+        const chatInput = document.getElementById('chat-input');
+        const sendChatBtn = document.getElementById('send-chat-btn');
+
+        // --- CONFIGURACIÓN DE HUBSPOT ---
+        // REEMPLAZA ESTOS VALORES CON LOS DE TU CUENTA DE HUBSPOT
+        const HUBSPOT_PORTAL_ID = '50137499'; // Ejemplo: '12345678'
+        const HUBSPOT_FORM_ID = 'bef93062-7f6b-4a7a-99cb-3ec2c84c9398'; // Ejemplo: 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx'
+
+     // --- CONFIGURACIÓN DEL BACKEND ---
+// Esta URL apunta a tu servidor local. Cuando despliegues en Render, la cambiarás.
+const API_BACKEND_URL = 'http://127.0.0.1:8000/api/generate';
+        // --- ESTADO DE LA CONVERSACIÓN ---
+        let conversationState = {
+            currentStep: 0,
+            userData: {},
+            isWaitingForResponse: false,
+        };
+
+        const conversationFlow = [
+            {
+                key: 'name',
+                question: '¡Hola! Soy tu asistente de proyectos de FDG Constructions. Para empezar, ¿cuál es tu nombre?',
+                inputType: 'text',
+                validation: (value) => value.trim().length > 1,
+                errorMessage: 'Por favor, introduce un nombre válido.'
+            },
+            {
+                key: 'email',
+                question: (name) => `¡Un placer, ${name}! ¿Cuál es tu dirección de correo electrónico? La usaremos para enviarte la cotización.`,
+                inputType: 'email',
+                validation: (value) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value),
+                errorMessage: 'Parece que ese no es un correo electrónico válido. ¿Podrías intentarlo de nuevo?'
+            },
+            {
+                key: 'phone',
+                question: 'Gracias. Ahora, ¿podrías facilitarme tu número de teléfono? Así podremos contactarte si tenemos alguna duda rápida.',
+                inputType: 'tel',
+                validation: (value) => /^[+]*[(]{0,1}[0-9]{1,4}[)]{0,1}[-\s\./0-9]*$/.test(value) && value.length > 7,
+                errorMessage: 'Por favor, introduce un número de teléfono válido.'
+            },
+            {
+                key: 'project_type',
+                question: 'Perfecto. ¿Qué tipo de proyecto tienes en mente?',
+                inputType: 'options',
+                options: ['Remodelación de Cocina', 'Remodelación de Baño', 'Ampliación de Vivienda', 'Terraza/Patio', 'Suelos', 'Techos', 'Otro']
+            },
+            {
+                key: 'description',
+                question: (type) => `Genial, un proyecto de "${type}". ¿Podrías darme una breve descripción de lo que te gustaría lograr?`,
+                inputType: 'text',
+                validation: (value) => value.trim().length > 10,
+                errorMessage: 'Por favor, danos un poco más de detalle sobre tu proyecto.'
+            },
+            {
+                key: 'budget',
+                question: 'Entendido. Y para darnos una idea, ¿cuál es tu presupuesto estimado para este proyecto?',
+                inputType: 'options',
+                options: ['Menos de $10,000', '$10k - $25k', '$25k - $50k', '$50k - $100k', 'Más de $100k', 'Prefiero no decirlo']
+            }
+        ];
+
+        // --- FUNCIONES DEL CHAT ---
+
+        const addMessage = (content, sender, isHTML = false) => {
+            const bubble = document.createElement('div');
+            bubble.className = `chat-bubble chat-bubble-${sender}`;
+            if (isHTML) {
+                bubble.innerHTML = content;
+            } else {
+                bubble.textContent = content;
+            }
+            chatContainer.appendChild(bubble);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+            return bubble;
+        };
+
+        const showTypingIndicator = () => {
+            if (document.getElementById('typing-indicator')) return;
+            const indicatorHTML = `
+                <div id="typing-indicator" class="chat-bubble chat-bubble-ai typing-indicator">
+                    <span></span><span></span><span></span>
+                </div>`;
+            chatContainer.insertAdjacentHTML('beforeend', indicatorHTML);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        };
+
+        const hideTypingIndicator = () => {
+            const indicator = document.getElementById('typing-indicator');
+            if (indicator) indicator.remove();
+        };
+
+        const showInputArea = (type, options = []) => {
+            chatInputArea.innerHTML = ''; // Limpiar área
+            chatInputArea.classList.remove('hidden');
+
+            if (type === 'options') {
+                const optionsContainer = document.createElement('div');
+                optionsContainer.className = 'chat-options-container';
+                options.forEach(optionText => {
+                    const button = document.createElement('button');
+                    button.className = 'chat-option-button';
+                    button.textContent = optionText;
+                    button.onclick = () => handleUserResponse(optionText);
+                    optionsContainer.appendChild(button);
+                });
+                chatInputArea.appendChild(optionsContainer);
+            } else {
+                const inputHTML = `
+                    <input type="${type}" id="chat-input" placeholder="Escribe tu respuesta..." class="chat-input" autocomplete="${type === 'email' ? 'email' : (type === 'tel' ? 'tel' : 'off')}">
+                    <button id="send-chat-btn" class="btn-primary">Enviar</button>
+                `;
+                chatInputArea.innerHTML = inputHTML;
+                document.getElementById('chat-input').focus();
+                document.getElementById('send-chat-btn').onclick = () => handleUserResponse();
+                document.getElementById('chat-input').onkeypress = (e) => {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        handleUserResponse();
+                    }
+                };
+            }
+        };
+
+        const hideInputArea = () => {
+            chatInputArea.classList.add('hidden');
+        };
+
+        const askQuestion = () => {
+            conversationState.isWaitingForResponse = false;
+            hideInputArea();
+            const step = conversationFlow[conversationState.currentStep];
+            if (!step) {
+                endConversation();
+                return;
+            }
+
+            showTypingIndicator();
+            setTimeout(() => {
+                hideTypingIndicator();
+                let questionText = typeof step.question === 'function' 
+                    ? step.question(conversationState.userData[conversationFlow[conversationState.currentStep - 1].key]) 
+                    : step.question;
+                
+                addMessage(questionText, 'ai');
+                showInputArea(step.inputType, step.options);
+            }, 1200);
+        };
+
+        const handleUserResponse = (optionValue = null) => {
+            if (conversationState.isWaitingForResponse) return;
+
+            const input = document.getElementById('chat-input');
+            const userInput = optionValue || (input ? input.value : null);
+            const step = conversationFlow[conversationState.currentStep];
+
+            if (!userInput || !step.validation(userInput)) {
+                addMessage(step.errorMessage, 'ai');
+                return;
+            }
+            
+            conversationState.isWaitingForResponse = true;
+            addMessage(userInput, 'user');
+            hideInputArea();
+            
+            conversationState.userData[step.key] = userInput;
+            conversationState.currentStep++;
+            
+            setTimeout(askQuestion, 500);
+        };
+
+        const endConversation = () => {
+            showTypingIndicator();
+            setTimeout(() => {
+                hideTypingIndicator();
+                const confirmationHTML = `
+                    <p>¡Excelente! Hemos completado tu plan de proyecto. Aquí tienes un resumen:</p>
+                    <ul class="list-disc list-inside text-sm opacity-90 my-3">
+                        <li><strong>Proyecto:</strong> ${conversationState.userData.project_type}</li>
+                        <li><strong>Presupuesto:</strong> ${conversationState.userData.budget}</li>
+                        <li><strong>Contacto:</strong> ${conversationState.userData.email}</li>
+                    </ul>
+                    <p><strong>¿Estás listo para enviar tu plan de proyecto a nuestro equipo?</strong></p>
+                    <div class="chat-options-container">
+                        <button id="confirm-send-btn" class="chat-option-button" style="background-color: var(--success-green); border-color: var(--success-green);">Sí, Enviar Plan</button>
+                        <button id="cancel-send-btn" class="chat-option-button">No, empezar de nuevo</button>
+                    </div>
+                `;
+                addMessage(confirmationHTML, 'ai', true);
+                
+                document.getElementById('confirm-send-btn').onclick = () => {
+                    document.getElementById('confirm-send-btn').textContent = 'Enviando...';
+                    document.getElementById('confirm-send-btn').disabled = true;
+                    submitToHubSpot();
+                };
+                document.getElementById('cancel-send-btn').onclick = startConversation;
+
+            }, 1500);
+        };
+
+        const submitToHubSpot = () => {
+            if (!HUBSPOT_PORTAL_ID || !HUBSPOT_FORM_ID) {
+                console.error("HubSpot Portal ID o Form ID no están configurados.");
+                addMessage("Lo siento, hubo un error técnico al enviar el formulario. Por favor, contacta con nosotros directamente.", 'ai');
+                return;
+            }
+
+            hbspt.forms.create({
+                region: "na1",
+                portalId: HUBSPOT_PORTAL_ID,
+                formId: HUBSPOT_FORM_ID,
+                target: '#hubspot-form-container-hidden',
+                onFormReady: function($form) {
+                    // Pre-llenar los campos del formulario con los datos recopilados
+                    // Asegúrate de que los 'name' coincidan con los nombres de las propiedades en HubSpot
+                    $form.find('input[name="firstname"]').val(conversationState.userData.name.split(' ')[0]).change();
+                    $form.find('input[name="lastname"]').val(conversationState.userData.name.split(' ').slice(1).join(' ')).change();
+                    $form.find('input[name="email"]').val(conversationState.userData.email).change();
+                    $form.find('input[name="phone"]').val(conversationState.userData.phone).change();
+                    $form.find('select[name="project_type"]').val(conversationState.userData.project_type).change();
+                    $form.find('textarea[name="project_description"]').val(conversationState.userData.description).change();
+                    $form.find('select[name="budget"]').val(conversationState.userData.budget).change();
+                    
+                    // Enviar el formulario automáticamente
+                    $form.submit();
+                },
+                onFormSubmitted: function() {
+                    // Mostrar mensaje de éxito DENTRO del chat
+                    showTypingIndicator();
+                    setTimeout(() => {
+                        hideTypingIndicator();
+                        const successMessage = `
+                            <p><strong>¡Gracias, ${conversationState.userData.name}!</strong></p>
+                            <p>Hemos recibido tu plan de proyecto. Un miembro de nuestro equipo se pondrá en contacto contigo en las próximas 24 horas hábiles.</p>
+                            <p>¡Estamos emocionados de ayudarte a construir tu visión! 🏗️✨</p>
+                        `;
+                        addMessage(successMessage, 'ai', true);
+                    }, 1000);
+                }
+            });
+        };
+
+        const startConversation = () => {
+            chatContainer.innerHTML = '';
+            conversationState = {
+                currentStep: 0,
+                userData: {},
+                isWaitingForResponse: false,
+            };
+            askQuestion();
+        };
+
+        // --- INICIALIZACIÓN ---
+        startConversation();
+
+
+        // --- ANIMACIONES DE SCROLL (Intersection Observer) ---
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, {
+            threshold: 0.1
+        });
+
+        const fadeElements = document.querySelectorAll('.fade-in');
+        fadeElements.forEach(el => observer.observe(el));
+    });
+    </script>
+</body>
+</html>
