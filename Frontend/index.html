@@ -88,14 +88,22 @@
             font-size: 16px; transition: all 0.3s ease;
         }
         .chat-input:focus { outline: none; border-color: var(--primary-yellow); box-shadow: 0 0 0 3px rgba(252, 211, 77, 0.2); }
-        
+        .typing-indicator { display: flex; align-items: center; gap: 5px; padding: 16px 20px; }
+        .typing-indicator span { height: 8px; width: 8px; background-color: var(--text-muted); border-radius: 50%; animation: bounce 1.4s infinite ease-in-out both; }
+        .typing-indicator span:nth-child(1) { animation-delay: -0.32s; }
+        .typing-indicator span:nth-child(2) { animation-delay: -0.16s; }
+        @keyframes bounce { 0%, 80%, 100% { transform: scale(0); } 40% { transform: scale(1.0); } }
+        .chat-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px; padding-left: 10px; }
+        .chat-btn { background: rgba(252, 211, 77, 0.1); border: 1px solid var(--primary-yellow); color: var(--primary-yellow); padding: 8px 16px; border-radius: 20px; cursor: pointer; transition: all 0.2s ease-in-out; font-size: 14px; font-weight: 500; }
+        .chat-btn:hover { background: var(--primary-yellow); color: var(--dark-bg); transform: translateY(-2px); }
+
         /* HubSpot Manual Form Styles */
         #manual-form-container {
             background: var(--card-bg); border: 1px solid var(--border-color);
             border-radius: 16px; padding: 2rem;
         }
         #manual-form-container .hs-form-field label {
-            color: var(--text-primary) !important; font-weight: 600 !important; margin-bottom: 0.5rem;
+            color: var(--text-primary) !important; font-weight: 600 !important; margin-bottom: 0.5rem; display: block;
         }
         #manual-form-container .hs-input, #manual-form-container .hs-select {
             background-color: var(--dark-bg) !important; border: 2px solid var(--border-color) !important;
@@ -105,7 +113,7 @@
         #manual-form-container .hs-button {
             background: linear-gradient(135deg, var(--primary-yellow), var(--primary-yellow-hover)) !important;
             color: var(--dark-bg) !important; font-weight: 700 !important; border: none !important;
-            width: 100%; padding: 16px 32px !important; border-radius: 12px !important;
+            width: 100%; padding: 16px 32px !important; border-radius: 12px !important; margin-top: 1rem;
         }
         #manual-form-container .hs-richtext, #manual-form-container p, #manual-form-container .hs-form-required {
             color: var(--text-secondary) !important;
@@ -119,10 +127,55 @@
 <body class="bg-dark-bg text-text-primary">
 
     <header class="sticky top-0 z-40 bg-dark-bg/80 backdrop-blur-lg border-b border-border-color">
-        </header>
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center py-4">
+                <a href="#" class="flex items-center space-x-4">
+                    <img src="https://assets.zyrosite.com/ALpbKwnbRlSMvo8k/fdg-YD0wEDy1DOtWNaNj.png" alt="FDG Constructions Logo" class="h-20 md:h-24">
+                </a>
+                <nav class="hidden lg:flex items-center space-x-8">
+                    <a href="#services" class="font-medium text-text-secondary hover:text-primary-yellow transition-colors">Services</a>
+                    <a href="#process" class="font-medium text-text-secondary hover:text-primary-yellow transition-colors">Our Process</a>
+                    <a href="#testimonials" class="font-medium text-text-secondary hover:text-primary-yellow transition-colors">Testimonials</a>
+                    <a href="#ai-planner" class="font-medium text-text-secondary hover:text-primary-yellow transition-colors">AI Planner</a>
+                </nav>
+                <div class="flex items-center space-x-4">
+                    <a href="tel:+14304445162" class="hidden md:inline-flex items-center text-text-secondary hover:text-primary-yellow transition-colors font-semibold">
+                        <i class="fa-solid fa-phone mr-2"></i> +1 (430) 444-5162
+                    </a>
+                    <a href="#ai-planner" class="btn-primary hidden sm:inline-flex">
+                        <i class="fa-solid fa-rocket"></i> Get Free Quote
+                    </a>
+                    <button id="mobile-menu-button" class="lg:hidden text-2xl text-text-secondary hover:text-primary-yellow">
+                        <i class="fa-solid fa-bars"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div id="mobile-menu" class="lg:hidden hidden px-4 pt-2 pb-4 border-t border-border-color">
+            <a href="#services" class="block py-2 text-text-secondary hover:text-primary-yellow">Services</a>
+            <a href="#process" class="block py-2 text-text-secondary hover:text-primary-yellow">Our Process</a>
+            <a href="#testimonials" class="block py-2 text-text-secondary hover:text-primary-yellow">Testimonials</a>
+            <a href="#ai-planner" class="block py-2 text-text-secondary hover:text-primary-yellow">AI Planner</a>
+            <a href="tel:+14304445162" class="block py-2 text-text-secondary hover:text-primary-yellow"><i class="fa-solid fa-phone mr-2"></i> Call Us</a>
+        </div>
+    </header>
 
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
+        <section class="text-center py-24 md:py-32">
+            <h1 class="text-4xl md:text-6xl font-black mb-4 leading-tight">
+                Buildin' a <span class="highlight-yellow">Better Dallas</span>, One Project at a Time.
+            </h1>
+            <p class="text-xl text-text-secondary mb-10 max-w-3xl mx-auto">
+                Y'all have a vision? We've got the tools, the team, and the tech to make it happen. Let our AI Project Planner get your free, no-nonsense quote started in minutes.
+            </p>
+            <a href="#ai-planner" class="btn-primary text-lg">
+                <i class="fa-solid fa-brain"></i> Start with AI Planner
+            </a>
+        </section>
+
+        <hr class="border-border-color my-24">
+
         <section id="ai-planner" class="py-20">
             <div class="text-center mb-12">
                 <h2 class="section-title">AI-Powered Project Planner</h2>
@@ -148,11 +201,29 @@
             <div id="manual-form-container" class="max-w-4xl mx-auto">
                 </div>
         </section>
-
-        </main>
+        
+    </main>
 
     <footer class="bg-card-bg border-t border-border-color mt-24">
-        </footer>
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 text-center">
+            <img src="https://assets.zyrosite.com/ALpbKwnbRlSMvo8k/fdg-YD0wEDy1DOtWNaNj.png" alt="FDG Constructions Logo" class="h-24 mx-auto mb-6">
+            <p class="text-2xl font-bold mb-2">Let's Build Something Great Together.</p>
+            <p class="text-text-secondary mb-8">Ready to start your next project in the Dallas-Fort Worth area?</p>
+            <div class="flex justify-center items-center flex-wrap gap-6 mb-10">
+                <a href="#ai-planner" class="btn-primary"><i class="fa-solid fa-rocket"></i> Start AI Plan</a>
+                <a href="tel:+14304445162" class="btn-primary" style="background: transparent; border: 2px solid var(--primary-yellow); color: var(--primary-yellow);"><i class="fa-solid fa-phone"></i> Call a Specialist</a>
+            </div>
+            <div class="flex justify-center items-center space-x-6 mb-8">
+                 <a href="mailto:contact@fdgconstructions.site" class="text-text-secondary hover:text-primary-yellow transition-colors"><i class="fa-solid fa-envelope mr-2"></i>contact@fdgconstructions.site</a>
+                <a href="tel:+14304445162" class="text-text-secondary hover:text-primary-yellow transition-colors"><i class="fa-solid fa-phone mr-2"></i>+1 (430) 444-5162</a>
+                <a href="https://www.facebook.com/profile.php?id=61577760321860" target="_blank" rel="noopener noreferrer" class="text-text-secondary hover:text-primary-yellow transition-colors text-2xl">
+                    <i class="fa-brands fa-facebook"></i>
+                </a>
+            </div>
+            <p class="text-text-muted text-sm">&copy; 2025 FDG Constructions LLC. All rights reserved. Built for Dallas, by Dallas.</p>
+        </div>
+    </footer>
+
 
     <script>
     document.addEventListener('DOMContentLoaded', () => {
@@ -166,6 +237,8 @@
         const chatContainer = document.getElementById('chat-container');
         const chatInput = document.getElementById('chat-input');
         const sendBtn = document.getElementById('send-chat-btn');
+        const mobileMenuButton = document.getElementById('mobile-menu-button');
+        const mobileMenu = document.getElementById('mobile-menu');
 
         // --- STATE MANAGEMENT ---
         let conversationHistory = [];
@@ -173,33 +246,61 @@
         let isWaitingForResponse = false;
         let isFormSubmitted = false;
         
-        // --- UI & CORE LOGIC FUNCTIONS (abbreviated for clarity) ---
-        const addMessage = (content, sender, isHTML = false) => { /* ... same as before ... */ };
-        const showTypingIndicator = () => { /* ... same as before ... */ };
-        const hideTypingIndicator = () => { /* ... same as before ... */ };
-        const setInputDisabled = (disabled) => { /* ... same as before ... */ };
+        // --- UI & CORE LOGIC FUNCTIONS ---
+        // These functions were missing because I abbreviated them. They are now fully restored.
+        mobileMenuButton.addEventListener('click', () => mobileMenu.classList.toggle('hidden'));
+        
+        const addMessage = (content, sender, isHTML = false) => {
+            const bubble = document.createElement('div');
+            bubble.className = `chat-bubble chat-bubble-${sender}`;
+            if (isHTML) {
+                bubble.innerHTML = content;
+            } else {
+                bubble.textContent = content;
+            }
+            chatContainer.appendChild(bubble);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        };
+        const showTypingIndicator = () => {
+            if (document.getElementById('typing-indicator')) return;
+            const i = `<div id="typing-indicator" class="chat-bubble chat-bubble-ai typing-indicator"><span></span><span></span><span></span></div>`;
+            chatContainer.insertAdjacentHTML('beforeend', i);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        };
+        const hideTypingIndicator = () => document.getElementById('typing-indicator')?.remove();
+        
+        const setInputDisabled = (disabled) => {
+            isWaitingForResponse = disabled;
+            chatInput.disabled = disabled;
+            sendBtn.disabled = disabled;
+            chatInput.placeholder = disabled ? "Waitin' on a reply..." : "Type your message here...";
+        };
+
+        const handleUserInput = () => {
+            const userInput = chatInput.value.trim();
+            if (!userInput || isWaitingForResponse) return;
+            chatInput.value = '';
+            callAIAssistant(userInput);
+        };
 
         // --- HUBSPOT FORM LOGIC ---
         const processAndSubmitForm = () => {
             addMessage("Alright, I'm sending this over to the team now. Stand by...", 'ai');
             setInputDisabled(true);
 
-            // *** FIX: CONVERT DATE TO A HUBSPOT-FRIENDLY TIMESTAMP ***
             let hubspotDate = '';
             if (projectData.preferred_inspection_project_start_date) {
                 try {
-                    // new Date() can parse "MM/DD/YYYY" and convert it to a timestamp.
                     hubspotDate = new Date(projectData.preferred_inspection_project_start_date).getTime();
                 } catch (e) {
                     console.error("Could not parse date:", projectData.preferred_inspection_project_start_date);
-                    // As a fallback, we can send an empty value or today's date
                     hubspotDate = ''; 
                 }
             }
 
             hbspt.forms.create({
                 region: "na1", portalId: HUBSPOT_PORTAL_ID, formId: HUBSPOT_FORM_ID,
-                target: '#hubspot-form-container-invisible', // Renders in the invisible container
+                target: '#hubspot-form-container-invisible',
                 onFormReady: function($form) {
                     $form.find('input[name="firstname"]').val(projectData.firstname).change();
                     $form.find('input[name="lastname"]').val(projectData.lastname).change();
@@ -210,10 +311,7 @@
                     $form.find('select[name="current_roof_condition"]').val(projectData.current_roof_condition).change();
                     $form.find('input[name="address"]').val(projectData.address).change();
                     $form.find('input[name="specific_lead_source"]').val(projectData.specific_lead_source).change();
-                    
-                    // *** APPLY THE FIX: Use the timestamp for the date field ***
                     $form.find('input[name="preferred_inspection_project_start_date"]').val(hubspotDate).change();
-
                     $form.find('select[name="lead_segmentation_qualification"]').val(projectData.lead_segmentation_qualification).change();
                     
                     $form.submit();
@@ -233,14 +331,22 @@
         const callAIAssistant = async (userInput) => {
             if (isWaitingForResponse || isFormSubmitted) return;
             setInputDisabled(true);
-            addMessage(userInput, 'user');
+            
+            // Only add the user message if it's not the initial, hidden call
+            if (userInput !== "Start the conversation") {
+                 addMessage(userInput, 'user');
+            }
+
             showTypingIndicator();
             try {
                 const currentConversation = conversationHistory;
                 const response = await fetch(API_BACKEND_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ prompt: userInput, conversationHistory: currentConversation }) });
                 
                 hideTypingIndicator();
-                if (!response.ok) throw new Error(`Server Error: ${response.status}`);
+                if (!response.ok) {
+                    console.error("Fetch response not OK:", response);
+                    throw new Error(`Server Error: ${response.status}`);
+                }
 
                 const data = await response.json();
                 let aiResponse = data.text;
@@ -271,10 +377,9 @@
                 setInputDisabled(false);
             }
         };
-
-        const handleUserInput = () => { /* ... same as before ... */ };
+        
         window.confirmProjectSubmission = () => { document.querySelector('.chat-actions').remove(); processAndSubmitForm() };
-        window.cancelProjectSubmission = () => { /* ... same as before ... */ };
+        window.cancelProjectSubmission = () => { document.querySelector('.chat-actions').remove(); addMessage("No problem! What would you like to change or add?", 'ai'); setInputDisabled(false); chatInput.focus() };
         sendBtn.addEventListener('click', handleUserInput);
         chatInput.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); handleUserInput() } });
         
