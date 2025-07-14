@@ -1,4 +1,3 @@
-# main.py
 import os
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
@@ -6,71 +5,72 @@ from pydantic import BaseModel
 import google.generativeai as genai
 from dotenv import load_dotenv
 
-# Carga la variable de entorno para desarrollo local y producción
-load_dotenv() 
+# Carga la variable de entorno para desarrollo local (no afectará a Render)
+load_dotenv()
 
 # Configura la app de FastAPI
-app = FastAPI()
+app = FastAPI(
+    title="FDG Constructions AI Backend",
+    description="API to connect the conversational frontend with Google's Gemini AI.",
+    version="1.0.0"
+)
 
-# Configura CORS para permitir solicitudes desde tu frontend de producción
-# ¡IMPORTANTE! Reemplaza "*" con tu dominio de producción real.
-# Si necesitas permitir acceso desde localhost para desarrollo, puedes añadirlo también.
-PRODUCTION_DOMAIN = "https://fdgconstructions.site"
-ALLOW_ORIGINS = [
-    PRODUCTION_DOMAIN,
-    "http://localhost:8000", # Permite localhost para desarrollo si es necesario
-    "http://127.0.0.1:8000", # Permite localhost para desarrollo si es necesario
+# --- Configuración de CORS para Producción ---
+# Se especifica el dominio exacto del frontend para máxima seguridad.
+# Render maneja la comunicación interna, pero esto previene que otros sitios usen tu API.
+origins = [
+    "https://fdgconstructions.site",
+    # Si tienes un dominio de vista previa en Render, agrégalo aquí también.
+    # "https://your-render-preview-domain.onrender.com",
+    # Para pruebas locales, puedes agregar:
+    # "http://127.0.0.1:5500",
+    # "http://localhost:8000"
 ]
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=ALLOW_ORIGINS, 
+    allow_origins=origins, # <-- ¡CAMBIO IMPORTANTE!
     allow_credentials=True,
-    allow_methods=["*"], # Permite todos los métodos HTTP (GET, POST, etc.)
-    allow_headers=["*"], # Permite todas las cabeceras
+    allow_methods=["POST", "GET"], # Solo permitir los métodos necesarios
+    allow_headers=["Content-Type"],   # Solo permitir los encabezados necesarios
 )
 
-# Configura la clave de API de Gemini de forma segura
-# Asegúrate de que la variable de entorno GEMINI_API_KEY esté configurada en Render
+# Configura la clave de API de Gemini de forma segura desde las variables de entorno de Render
 try:
     gemini_api_key = os.getenv("GEMINI_API_KEY")
     if not gemini_api_key:
-        raise ValueError("GEMINI_API_KEY environment variable not set.")
+        raise ValueError("GEMINI_API_KEY environment variable not found.")
     genai.configure(api_key=gemini_api_key)
-except ValueError as ve:
-    print(f"Configuration Error: {ve}")
-    # En un entorno de producción, podrías querer registrar esto o lanzar una excepción más fuerte
 except Exception as e:
-    print(f"An unexpected error occurred during Gemini API configuration: {e}")
+    # Esto se imprimirá en los logs de Render si hay un problema al iniciar.
+    print(f"CRITICAL ERROR: Could not configure Gemini API. {e}")
 
-# Define el modelo de datos para la solicitud del prompt
+# Define el modelo de datos para la solicitud que llega del frontend
 class PromptRequest(BaseModel):
     prompt: str
+    conversationHistory: list # Incluimos el historial para dar contexto a la IA
 
 @app.post("/api/generate")
 async def generate_content_route(request: PromptRequest):
-    """
-    Endpoint para recibir un prompt del frontend y devolver la respuesta de Gemini.
-    """
     if not request.prompt:
         raise HTTPException(status_code=400, detail="No prompt provided.")
 
     try:
-        # Usamos un modelo más capaz como 'gemini-1.5-pro-latest' o 'gemini-1.5-flash-latest'
-        # gemini-1.5-pro-latest es más potente, gemini-1.5-flash-latest es más rápido y económico
-        model = genai.GenerativeModel('gemini-1.5-pro-latest') 
-        
-        # Genera contenido usando el prompt
-        response = model.generate_content(request.prompt)
-        
-        # Devuelve el texto de la respuesta
+        # Usamos un modelo pro para un chat más sofisticado
+        model = genai.GenerativeModel('gemini-1.5-pro')
+
+        # El historial de la conversación se pasa directamente al modelo
+        # para que cada nueva respuesta tenga el contexto completo.
+        response = model.generate_content(
+            request.conversationHistory + [{'role': 'user', 'parts': [request.prompt]}]
+        )
+
         return {"text": response.text}
-        
     except Exception as e:
-        print(f"Error in /api/generate: {str(e)}") # Log the error for debugging
-        raise HTTPException(status_code=500, detail=f"Failed to generate content: {str(e)}")
+        # Log del error para depuración en Render
+        print(f"Error during Gemini content generation: {e}")
+        raise HTTPException(status_code=500, detail=f"Error generating content: {str(e)}")
 
 @app.get("/")
 def read_root():
-    """Endpoint raíz para verificar que el backend está funcionando."""
-    return {"status": "FDG Constructions Backend API is running"}
+    return {"status": "FDG Constructions AI Backend is live and running."}
