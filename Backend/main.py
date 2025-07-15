@@ -1,560 +1,94 @@
-<!DOCTYPE html>
-<html lang="en" class="scroll-smooth">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="FDG Constructions offers premier roofing and construction services in Dallas, TX. Plan your project with our AI assistant and get a free, no-commitment quote.">
-    <meta name="keywords" content="Roofing Dallas, Construction Dallas TX, Remodeling, AI Project Planner, FDG Constructions, Free Quote">
-    <title>FDG Constructions | AI-Powered Roofing & Construction in Dallas, TX</title>
+import os
+from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
+import google.generativeai as genai
+from dotenv import load_dotenv
 
-    <script src="https://cdn.tailwindcss.com"></script>
+load_dotenv()
 
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-    
-    <script charset="utf-8" type="text/javascript" src="//js.hsforms.net/forms/embed/v2.js"></script>
+app = FastAPI(
+    title="FDG Constructions AI Backend",
+    version="1.1.0"
+)
 
-    <script type="text/javascript" id="hs-script-loader" async defer src="//js.hs-scripts.com/50137499.js"></script>
-    
-    <style>
-        :root {
-            --primary-yellow: #FCD34D;
-            --primary-yellow-hover: #FBBF24;
-            --dark-bg: #0A0A0A;
-            --card-bg: #131313;
-            --border-color: #262626;
-            --text-primary: #F5F5F5;
-            --text-secondary: #A3A3A3;
-            --text-muted: #737373;
-            --glass-bg: rgba(26, 26, 26, 0.6);
-        }
+# --- Configuración de CORS ---
+origins = [
+    "https://fdgconstructions.site",
+    "http://fdgconstructions.site"
+]
 
-        html { scroll-behavior: smooth; }
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: var(--dark-bg);
-            color: var(--text-primary);
-            overflow-x: hidden;
-        }
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["POST", "GET"],
+    allow_headers=["Content-Type"],
+)
 
-        /* Custom Scrollbar */
-        ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-track { background: var(--dark-bg); }
-        ::-webkit-scrollbar-thumb { background: var(--primary-yellow); border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: var(--primary-yellow-hover); }
+# --- Configuración de la API de Gemini ---
+try:
+    gemini_api_key = os.getenv("GEMINI_API_KEY")
+    if not gemini_api_key:
+        raise ValueError("GEMINI_API_KEY environment variable not found.")
+    genai.configure(api_key=gemini_api_key)
+except Exception as e:
+    print(f"CRITICAL ERROR: Could not configure Gemini API. {e}")
+
+# --- Instrucciones del Sistema para la IA ---
+# Las instrucciones ahora viven de forma segura en el backend.
+SYSTEM_INSTRUCTIONS = """You are "Project Pal," a friendly, helpful, and slightly informal AI assistant for FDG Constructions in Dallas, TX. Your persona should reflect a Dallas local: confident, friendly, efficient. Your primary goal is to conduct a conversational "intake interview" to gather all necessary information for a project quote.
+
+**Core Mission:** Collect the data for the following JSON keys, IN ORDER, asking one question at a time. Do not move to the next question until you have a reasonable answer for the current one.
+1.  **firstname**: (e.g., "First off, who do I have the pleasure of speakin' with?")
+2.  **lastname**: (e.g., "And your last name?")
+3.  **email**: (e.g., "Great, what's the best email to send the quote to?")
+4.  **phone**: (e.g., "And a good phone number for our project manager to reach you at?")
+5.  **property_type**: Ask the user to choose one and present these options: Residential (Single-Family), Residential (Multi-Family/Apartments), Small Commercial (Office/Retail), Large Commercial (Industrial/Retail), Institutional (School/Church), Homeowners Association (HOA).
+6.  **service_type_requested**: Ask the user to choose one and present these options: Free Inspection, Roof Repair, Full Roof Replacement, New Roof Installation, Insurance Claim Estimate (Hail/Storm Damage), Preventative Maintenance, Other.
+7.  **current_roof_condition**: Ask the user to choose one and present these options: Storm Damage (Hail/Wind), Visible Leaks, Age-Related Wear, No Issues (Information Search Only), Old/Damaged Roof, Needs Professional Inspection.
+8.  **address**: (e.g., "What's the property address for the project in the DFW area?")
+9.  **specific_lead_source**: (e.g., "Just for our records, how'd y'all hear about us? (Google, Facebook, a friend, etc.)")
+10. **preferred_inspection_project_start_date**: (e.g., "Any preferred date you're lookin' to get this inspected or started?")
+
+**Critical Rules:**
+- **Start Strong:** At the beginning of the conversation, ALWAYS say: "By the way, if you'd rather talk to a human specialist right now, just give us a call at +1 (430) 444-5162."
+- **Present Options Clearly:** For multiple-choice questions, list the options for the user.
+- **Final Output:** Once you have collected ALL 10 data points, your FINAL response MUST BE ONLY a single, minified JSON object with the collected data.
+- **Infer Priority:** Based on the 'current_roof_condition', add one extra key to the final JSON: "lead_segmentation_qualification". If condition is 'Storm Damage (Hail/Wind)' or 'Visible Leaks', set it to 'High Priority (Hot Lead)'. If 'Age-Related Wear' or 'Old/Damaged Roof', set it to 'Medium Priority (Warm Lead)'. Otherwise, set it to 'Low Priority (Cold Lead)'.
+- **Example Final JSON:** {"firstname":"John","lastname":"Doe","email":"john.d@email.com","phone":"2145551234","property_type":"Residential (Single-Family)","service_type_requested":"Full Roof Replacement","current_roof_condition":"Storm Damage (Hail/Wind)","address":"123 Main St, Dallas, TX","specific_lead_source":"Google","preferred_inspection_project_start_date":"ASAP","lead_segmentation_qualification":"High Priority (Hot Lead)"}
+
+Start the conversation with the user now.
+"""
+
+# Define el modelo de datos para la solicitud que llega del frontend
+class PromptRequest(BaseModel):
+    prompt: str
+    conversationHistory: list
+
+# Inicializa el modelo de IA una sola vez con las instrucciones del sistema
+model = genai.GenerativeModel(
+    'gemini-1.5-pro',
+    system_instruction=SYSTEM_INSTRUCTIONS
+)
+
+@app.post("/api/generate")
+async def generate_content_route(request: PromptRequest):
+    if not request.prompt:
+        raise HTTPException(status_code=400, detail="No prompt provided.")
+
+    try:
+        # El historial de la conversación se pasa directamente al modelo
+        # para que cada nueva respuesta tenga el contexto completo.
+        # Ya no necesitamos agregar las instrucciones aquí.
+        history = request.conversationHistory + [{'role': 'user', 'parts': [request.prompt]}]
+        response = model.generate_content(history)
         
-        /* Main Call-to-Action Button Style */
-        .btn-primary {
-            background: linear-gradient(135deg, var(--primary-yellow), var(--primary-yellow-hover));
-            color: var(--dark-bg);
-            font-weight: 700;
-            padding: 16px 32px;
-            border-radius: 12px;
-            transition: all 0.3s cubic-bezier(0.19, 1, 0.22, 1);
-            box-shadow: 0 4px 20px rgba(252, 211, 77, 0.2);
-            position: relative;
-            overflow: hidden;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.5rem;
-            border: none;
-            cursor: pointer;
-        }
-        .btn-primary::before {
-            content: ''; position: absolute; top: 0; left: -100%;
-            width: 100%; height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
-            transition: left 0.6s;
-        }
-        .btn-primary:hover::before { left: 100%; }
-        .btn-primary:hover {
-            transform: translateY(-4px) scale(1.03);
-            box-shadow: 0 10px 30px rgba(252, 211, 77, 0.3);
-        }
+        return {"text": response.text}
+    except Exception as e:
+        print(f"Error during Gemini content generation: {e}")
+        raise HTTPException(status_code=500, detail=f"Error generating content: {str(e)}")
 
-        /* Section Title Style */
-        .section-title {
-            font-size: clamp(2.2rem, 5vw, 3rem);
-            font-weight: 800;
-            text-align: center;
-            margin-bottom: 1rem;
-            background: linear-gradient(135deg, var(--text-primary), var(--text-secondary));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            position: relative;
-        }
-        .section-subtitle {
-            text-align: center;
-            color: var(--text-secondary);
-            font-size: 1.125rem;
-            max-width: 60ch;
-            margin: 0 auto 4rem auto;
-        }
-        .highlight-yellow { color: var(--primary-yellow); }
-
-        /* Fade-in Animation on Scroll */
-        .fade-in {
-            opacity: 0;
-            transform: translateY(30px);
-            transition: opacity 0.8s cubic-bezier(0.19, 1, 0.22, 1), transform 0.8s cubic-bezier(0.19, 1, 0.22, 1);
-        }
-        .fade-in.visible {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        /* Chat Interface Styles */
-        .chat-container {
-            background: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 16px;
-            padding: 24px;
-            height: 600px;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
-        }
-        @keyframes slide-in-left { from { opacity: 0; transform: translateX(-20px) scale(0.95); } to { opacity: 1; transform: translateX(0) scale(1); } }
-        @keyframes slide-in-right { from { opacity: 0; transform: translateX(20px) scale(0.95); } to { opacity: 1; transform: translateX(0) scale(1); } }
-        .chat-bubble { padding: 16px 20px; border-radius: 18px; max-width: 85%; line-height: 1.5; transform-origin: bottom; word-wrap: break-word; }
-        .chat-bubble-ai {
-            background: #27272A; color: var(--text-primary);
-            border-radius: 18px 18px 18px 4px; align-self: flex-start;
-            animation: slide-in-left 0.5s cubic-bezier(0.19, 1, 0.22, 1) forwards;
-        }
-        .chat-bubble-user {
-            background: linear-gradient(135deg, var(--primary-yellow), var(--primary-yellow-hover)); color: var(--dark-bg);
-            border-radius: 18px 18px 4px 18px; align-self: flex-end; font-weight: 500;
-            animation: slide-in-right 0.5s cubic-bezier(0.19, 1, 0.22, 1) forwards;
-        }
-        .chat-input-container { display: flex; gap: 12px; margin-top: 16px; }
-        .chat-input {
-            flex: 1; background: var(--dark-bg); border: 2px solid var(--border-color); border-radius: 12px;
-            padding: 16px; color: var(--text-primary); font-size: 16px; transition: all 0.3s ease;
-        }
-        .chat-input:focus { outline: none; border-color: var(--primary-yellow); box-shadow: 0 0 0 3px rgba(252, 211, 77, 0.2); }
-        .typing-indicator { display: flex; align-items: center; gap: 5px; padding: 16px 20px; }
-        .typing-indicator span {
-            height: 8px; width: 8px; background-color: var(--text-muted); border-radius: 50%;
-            animation: bounce 1.4s infinite ease-in-out both;
-        }
-        .typing-indicator span:nth-child(1) { animation-delay: -0.32s; }
-        .typing-indicator span:nth-child(2) { animation-delay: -0.16s; }
-        @keyframes bounce { 0%, 80%, 100% { transform: scale(0); } 40% { transform: scale(1.0); } }
-
-        /* Action Buttons within Chat */
-        .chat-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px; padding-left: 10px; }
-        .chat-btn {
-            background: rgba(252, 211, 77, 0.1); border: 1px solid var(--primary-yellow); color: var(--primary-yellow);
-            padding: 8px 16px; border-radius: 20px; cursor: pointer; transition: all 0.2s ease-in-out;
-            font-size: 14px; font-weight: 500;
-        }
-        .chat-btn:hover { background: var(--primary-yellow); color: var(--dark-bg); transform: translateY(-2px); }
-        
-        /* Modal Styles */
-        .modal {
-            position: fixed; z-index: 50; left: 0; top: 0; width: 100%; height: 100%;
-            overflow: auto; background-color: rgba(0,0,0,0.8); backdrop-filter: blur(5px);
-            display: flex; align-items: center; justify-content: center;
-            opacity: 0; visibility: hidden; transition: opacity 0.3s ease, visibility 0.3s ease;
-        }
-        .modal.active { opacity: 1; visibility: visible; }
-        .modal-content {
-            background: var(--card-bg); margin: auto; padding: 30px;
-            border: 1px solid var(--border-color); border-radius: 20px;
-            width: 90%; max-width: 800px; position: relative;
-            transform: scale(0.95); transition: transform 0.3s ease;
-        }
-        .modal.active .modal-content { transform: scale(1); }
-        .modal-close {
-            color: var(--text-secondary); position: absolute; top: 15px; right: 25px;
-            font-size: 28px; font-weight: bold; cursor: pointer; transition: color 0.2s, transform 0.2s;
-        }
-        .modal-close:hover { color: var(--primary-yellow); transform: rotate(90deg); }
-    </style>
-</head>
-
-<body class="bg-dark-bg text-text-primary">
-
-    <header class="sticky top-0 z-40 bg-dark-bg/80 backdrop-blur-lg border-b border-border-color">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-center py-4">
-                <a href="#" class="flex items-center space-x-4">
-                    <img src="https://assets.zyrosite.com/ALpbKwnbRlSMvo8k/fdg-YD0wEDy1DOtWNaNj.png" alt="FDG Constructions Logo" class="h-20 md:h-24">
-                </a>
-                <nav class="hidden lg:flex items-center space-x-8">
-                    <a href="#services" class="font-medium text-text-secondary hover:text-primary-yellow transition-colors">Services</a>
-                    <a href="#process" class="font-medium text-text-secondary hover:text-primary-yellow transition-colors">Our Process</a>
-                    <a href="#testimonials" class="font-medium text-text-secondary hover:text-primary-yellow transition-colors">Testimonials</a>
-                    <a href="#ai-planner" class="font-medium text-text-secondary hover:text-primary-yellow transition-colors">AI Planner</a>
-                </nav>
-                <div class="flex items-center space-x-4">
-                    <a href="tel:+14304445162" class="hidden md:inline-flex items-center text-text-secondary hover:text-primary-yellow transition-colors font-semibold">
-                        <i class="fa-solid fa-phone mr-2"></i> +1 (430) 444-5162
-                    </a>
-                    <a href="#ai-planner" class="btn-primary hidden sm:inline-flex">
-                        <i class="fa-solid fa-rocket"></i> Get Free Quote
-                    </a>
-                    <button id="mobile-menu-button" class="lg:hidden text-2xl text-text-secondary hover:text-primary-yellow">
-                        <i class="fa-solid fa-bars"></i>
-                    </button>
-                </div>
-            </div>
-        </div>
-        <div id="mobile-menu" class="lg:hidden hidden px-4 pt-2 pb-4 border-t border-border-color">
-            <a href="#services" class="block py-2 text-text-secondary hover:text-primary-yellow">Services</a>
-            <a href="#process" class="block py-2 text-text-secondary hover:text-primary-yellow">Our Process</a>
-            <a href="#testimonials" class="block py-2 text-text-secondary hover:text-primary-yellow">Testimonials</a>
-            <a href="#ai-planner" class="block py-2 text-text-secondary hover:text-primary-yellow">AI Planner</a>
-            <a href="tel:+14304445162" class="block py-2 text-text-secondary hover:text-primary-yellow"><i class="fa-solid fa-phone mr-2"></i> Call Us</a>
-        </div>
-    </header>
-
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-
-        <section class="text-center py-24 md:py-32">
-            <div class="fade-in">
-                <h1 class="text-4xl md:text-6xl font-black mb-4 leading-tight">
-                    Buildin' a <span class="highlight-yellow">Better Dallas</span>, One Project at a Time.
-                </h1>
-                <p class="text-xl text-text-secondary mb-10 max-w-3xl mx-auto">
-                    Y'all have a vision? We've got the tools, the team, and the tech to make it happen. Let our AI Project Planner get your free, no-nonsense quote started in minutes.
-                </p>
-                <a href="#ai-planner" class="btn-primary text-lg">
-                    <i class="fa-solid fa-brain"></i> Start with AI Planner
-                </a>
-            </div>
-        </section>
-
-        <section class="py-16">
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-8 text-center max-w-5xl mx-auto">
-                <div class="fade-in">
-                    <p class="text-4xl md:text-5xl font-bold highlight-yellow" data-target="776">0</p>
-                    <p class="text-text-secondary mt-2">Projects Completed</p>
-                </div>
-                <div class="fade-in" style="transition-delay: 0.1s;">
-                    <p class="text-4xl md:text-5xl font-bold highlight-yellow" data-target="97">0</p>
-                    <p class="text-text-secondary mt-2">% Satisfaction Rate</p>
-                </div>
-                <div class="fade-in" style="transition-delay: 0.2s;">
-                    <p class="text-4xl md:text-5xl font-bold highlight-yellow" data-target="15">0</p>
-                    <p class="text-text-secondary mt-2">Years Combined Experience</p>
-                </div>
-                <div class="fade-in" style="transition-delay: 0.3s;">
-                    <p class="text-4xl md:text-5xl font-bold highlight-yellow" data-target="52">0</p>
-                    <p class="text-text-secondary mt-2">Expert Contractors</p>
-                </div>
-            </div>
-        </section>
-        
-        <hr class="border-border-color my-24">
-
-        <section id="services" class="py-20">
-            <h2 class="section-title fade-in">What We Do Best</h2>
-            <p class="section-subtitle fade-in">From the foundation to the roof, we've got Dallas covered. We specialize in high-quality construction and remodeling with a focus on durability and craftsmanship.</p>
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                <div class="fade-in p-8 bg-card-bg border border-border-color rounded-2xl transition-transform transform hover:-translate-y-2">
-                    <i class="fa-solid fa-house-chimney-window text-4xl highlight-yellow mb-4"></i>
-                    <h3 class="text-2xl font-bold mb-2">Roofing Construction</h3>
-                    <p class="text-text-secondary mb-6">Expert installation, repair, and replacement. We handle everything from storm damage insurance claims to brand new installations.</p>
-                    <button onclick="openServiceModal('roofing')" class="font-semibold text-primary-yellow hover:underline">View Gallery <i class="fa-solid fa-arrow-right ml-1"></i></button>
-                </div>
-                 <div class="fade-in p-8 bg-card-bg border border-border-color rounded-2xl transition-transform transform hover:-translate-y-2" style="transition-delay: 0.1s;">
-                    <i class="fa-solid fa-ruler-combined text-4xl highlight-yellow mb-4"></i>
-                    <h3 class="text-2xl font-bold mb-2">Home Remodeling</h3>
-                    <p class="text-text-secondary mb-6">Kitchens, bathrooms, or whole-house makeovers. We turn dated spaces into modern, functional masterpieces.</p>
-                    <button onclick="openServiceModal('remodeling')" class="font-semibold text-primary-yellow hover:underline">View Gallery <i class="fa-solid fa-arrow-right ml-1"></i></button>
-                </div>
-                 <div class="fade-in p-8 bg-card-bg border border-border-color rounded-2xl transition-transform transform hover:-translate-y-2" style="transition-delay: 0.2s;">
-                    <i class="fa-solid fa-paint-roller text-4xl highlight-yellow mb-4"></i>
-                    <h3 class="text-2xl font-bold mb-2">Siding & Painting</h3>
-                    <p class="text-text-secondary mb-6">Boost your curb appeal and protect your home with premium siding installation and professional exterior painting services.</p>
-                    <button onclick="openServiceModal('siding')" class="font-semibold text-primary-yellow hover:underline">View Gallery <i class="fa-solid fa-arrow-right ml-1"></i></button>
-                </div>
-            </div>
-        </section>
-        
-        <hr class="border-border-color my-24">
-
-        <section id="ai-planner" class="py-20">
-            <div class="text-center mb-12 fade-in">
-                <h2 class="section-title">AI-Powered Project Planner</h2>
-                <p class="section-subtitle">Let's talk about your project. Our AI assistant is here 24/7 to help you iron out the details. It's the smartest, fastest way to get started.</p>
-            </div>
-            <div class="max-w-4xl mx-auto fade-in" style="transition-delay: 0.2s;">
-                <div class="chat-container" id="chat-container">
-                </div>
-                <div id="chat-input-area" class="chat-input-container">
-                    <input type="text" id="chat-input" placeholder="Just say 'hi' to get started..." class="chat-input" autocomplete="off">
-                    <button id="send-chat-btn" class="btn-primary" aria-label="Send Message">
-                        <i class="fa-solid fa-paper-plane"></i>
-                    </button>
-                </div>
-                <div id="hubspot-form-container" class="hidden"></div>
-            </div>
-        </section>
-
-        <hr class="border-border-color my-24">
-        
-        <section id="process" class="py-20">
-            <h2 class="section-title fade-in">Our Simplified Process</h2>
-            <p class="section-subtitle fade-in">We keep it simple and transparent, so you're in the loop from start to finish. No surprises, just solid work.</p>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-center mt-12">
-                <div class="fade-in">
-                    <div class="p-6 bg-card-bg border border-border-color rounded-full w-24 h-24 mx-auto flex items-center justify-center mb-4">
-                        <i class="fa-solid fa-comments text-4xl highlight-yellow"></i>
-                    </div>
-                    <h3 class="text-xl font-bold mb-2">1. Plan & Quote</h3>
-                    <p class="text-text-secondary">Use our AI Planner or call us. We'll gather the details and provide a clear, comprehensive quote.</p>
-                </div>
-                <div class="fade-in" style="transition-delay: 0.2s;">
-                    <div class="p-6 bg-card-bg border border-border-color rounded-full w-24 h-24 mx-auto flex items-center justify-center mb-4">
-                        <i class="fa-solid fa-calendar-check text-4xl highlight-yellow"></i>
-                    </div>
-                    <h3 class="text-xl font-bold mb-2">2. Schedule & Build</h3>
-                    <p class="text-text-secondary">Once approved, we'll schedule the work with our expert crew and get started on bringing your vision to life.</p>
-                </div>
-                 <div class="fade-in" style="transition-delay: 0.4s;">
-                    <div class="p-6 bg-card-bg border border-border-color rounded-full w-24 h-24 mx-auto flex items-center justify-center mb-4">
-                        <i class="fa-solid fa-star text-4xl highlight-yellow"></i>
-                    </div>
-                    <h3 class="text-xl font-bold mb-2">3. Review & Complete</h3>
-                    <p class="text-text-secondary">We'll do a final walk-through with you to ensure every detail is perfect. Your satisfaction is our success.</p>
-                </div>
-            </div>
-        </section>
-
-        <hr class="border-border-color my-24">
-        
-        <section id="testimonials" class="py-20">
-            <h2 class="section-title fade-in">What Our Neighbors Are Sayin'</h2>
-            <p class="section-subtitle fade-in">Proudly serving communities across the DFW area. Here's what some of our clients have to say.</p>
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mt-12">
-                <div class="fade-in p-8 bg-card-bg border border-border-color rounded-2xl">
-                    <div class="flex items-center mb-4">
-                        <img src="https://i.pravatar.cc/50?u=a" alt="Client photo" class="w-12 h-12 rounded-full mr-4">
-                        <div>
-                            <p class="font-bold">Sarah K.</p>
-                            <p class="text-sm text-text-muted">Preston Hollow, Dallas</p>
-                        </div>
-                    </div>
-                    <p class="text-text-secondary">"After the last hail storm, I was dreading the roof replacement process. FDG made it painless. Their AI thing got the ball rolling, and their team was professional and fast. My new roof looks fantastic!"</p>
-                </div>
-                <div class="fade-in p-8 bg-card-bg border border-border-color rounded-2xl" style="transition-delay: 0.2s;">
-                    <div class="flex items-center mb-4">
-                        <img src="https://i.pravatar.cc/50?u=b" alt="Client photo" class="w-12 h-12 rounded-full mr-4">
-                        <div>
-                            <p class="font-bold">Mike & Jen R.</p>
-                            <p class="text-sm text-text-muted">Frisco, TX</p>
-                        </div>
-                    </div>
-                    <p class="text-text-secondary">"We used FDG for a full kitchen remodel. The craftsmanship is top-notch. They stayed on budget and finished ahead of schedule. We finally have the kitchen of our dreams. Highly recommend these guys."</p>
-                </div>
-                <div class="fade-in p-8 bg-card-bg border border-border-color rounded-2xl" style="transition-delay: 0.4s;">
-                     <div class="flex items-center mb-4">
-                        <img src="https://i.pravatar.cc/50?u=c" alt="Client photo" class="w-12 h-12 rounded-full mr-4">
-                        <div>
-                            <p class="font-bold">David Chen</p>
-                            <p class="text-sm text-text-muted">Uptown, Dallas</p>
-                        </div>
-                    </div>
-                    <p class="text-text-secondary">"As a small business owner, getting our retail space updated was critical. FDG Constructions was efficient and communicative. The conversational planner was surprisingly easy and got me a quote fast."</p>
-                </div>
-            </div>
-        </section>
-        
-    </main>
-
-    <footer class="bg-card-bg border-t border-border-color mt-24">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 text-center">
-            <img src="https://assets.zyrosite.com/ALpbKwnbRlSMvo8k/fdg-YD0wEDy1DOtWNaNj.png" alt="FDG Constructions Logo" class="h-24 mx-auto mb-6">
-            <p class="text-2xl font-bold mb-2">Let's Build Something Great Together.</p>
-            <p class="text-text-secondary mb-8">Ready to start your next project in the Dallas-Fort Worth area?</p>
-            <div class="flex justify-center items-center flex-wrap gap-6 mb-10">
-                <a href="#ai-planner" class="btn-primary"><i class="fa-solid fa-rocket"></i> Start AI Plan</a>
-                <a href="tel:+14304445162" class="btn-primary" style="background: transparent; border: 2px solid var(--primary-yellow); color: var(--primary-yellow);"><i class="fa-solid fa-phone"></i> Call a Specialist</a>
-            </div>
-            <div class="flex justify-center items-center space-x-6 mb-8">
-                 <a href="mailto:contact@fdgconstructions.site" class="text-text-secondary hover:text-primary-yellow transition-colors"><i class="fa-solid fa-envelope mr-2"></i>contact@fdgconstructions.site</a>
-                <a href="tel:+14304445162" class="text-text-secondary hover:text-primary-yellow transition-colors"><i class="fa-solid fa-phone mr-2"></i>+1 (430) 444-5162</a>
-                <a href="https://www.facebook.com/profile.php?id=61577760321860" target="_blank" rel="noopener noreferrer" class="text-text-secondary hover:text-primary-yellow transition-colors text-2xl">
-                    <i class="fa-brands fa-facebook"></i>
-                </a>
-            </div>
-            <p class="text-text-muted text-sm">&copy; 2025 FDG Constructions LLC. All rights reserved. Built for Dallas, by Dallas.</p>
-        </div>
-    </footer>
-
-    <div id="service-modal" class="modal">
-      <div class="modal-content">
-        <span class="modal-close" onclick="closeModal()">&times;</span>
-        <h2 id="modal-title" class="text-3xl font-bold mb-4 highlight-yellow">Service Details</h2>
-        <p id="modal-description" class="text-text-secondary mb-6">Details about the service.</p>
-        <div id="modal-gallery" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        </div>
-      </div>
-    </div>
-
-    <script>
-    document.addEventListener('DOMContentLoaded', () => {
-
-        // --- CONFIGURATION ---
-        const HUBSPOT_PORTAL_ID = '50137499';
-        const HUBSPOT_FORM_ID = 'bef93062-7f6b-4a7a-99cb-3ec2c84c9398';
-        const API_BACKEND_URL = 'https://fdg-backend.onrender.com/api/generate';
-        
-        // --- SECURITY NOTE ---
-        const GEMINI_API_KEY = 'TU_BACKEND_SEGURO_AQUI';
-
-        // --- DOM ELEMENTS ---
-        const chatContainer = document.getElementById('chat-container');
-        const chatInput = document.getElementById('chat-input');
-        const sendBtn = document.getElementById('send-chat-btn');
-        const mobileMenuButton = document.getElementById('mobile-menu-button');
-        const mobileMenu = document.getElementById('mobile-menu');
-
-        // --- STATE MANAGEMENT ---
-        let conversationHistory = [];
-        let projectData = {};
-        let isWaitingForResponse = false;
-        let isFormSubmitted = false;
-        
-        // --- UI & ANIMATIONS ---
-        mobileMenuButton.addEventListener('click', () => mobileMenu.classList.toggle('hidden'));
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) entry.target.classList.add('visible');
-            });
-        }, { threshold: 0.1 });
-        document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
-        const counters = document.querySelectorAll('.highlight-yellow[data-target]');
-        const animateCounter = c => { const t = +c.getAttribute('data-target'), d = 2000, s = Math.abs(Math.floor(d / t)); let i = 0; const a = setInterval(() => { i++, c.innerText = i, i == t && clearInterval(a) }, s) };
-        const counterObserver = new IntersectionObserver((e, o) => { e.forEach(n => { n.isIntersecting && (animateCounter(n.target), o.unobserve(n.target)) }) }, { threshold: .5 });
-        counters.forEach(c => counterObserver.observe(c));
-
-        // --- MODAL LOGIC ---
-        const serviceModal = document.getElementById('service-modal'), modalTitle = document.getElementById('modal-title'), modalDescription = document.getElementById('modal-description'), modalGallery = document.getElementById('modal-gallery');
-        const serviceData = {
-            roofing: { title: "Roofing Construction Gallery", description: "From durable shingles to modern metal roofing, we ensure your home is protected and looks great. Here are some examples of our roofing work across Dallas.", images: ["https://images.unsplash.com/photo-1564152402101-3e0e7858c224?q=80&w=1974&auto=format&fit=crop", "https://images.unsplash.com/photo-1609249167730-e377a64a3878?q=80&w=1964&auto=format&fit=crop", "https://images.unsplash.com/photo-1590423403398-e53a2909a397?q=80&w=2070&auto=format&fit=crop", "https://images.unsplash.com/photo-1574320899187-5d2524a87235?q=80&w=2070&auto=format&fit=crop"] },
-            remodeling: { title: "Home Remodeling Gallery", description: "Transforming interiors is our passion. See how we've reimagined kitchens, bathrooms, and living spaces for our clients.", images: ["https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=2070&auto=format&fit=crop", "https://images.unsplash.com/photo-1556912173-3bb406ef7e77?q=80&w=2070&auto=format&fit=crop", "https://images.unsplash.com/photo-1616046229478-9901c5536a45?q=80&w=2080&auto=format&fit=crop", "https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?q=80&w=2071&auto=format&fit=crop"] },
-            siding: { title: "Siding & Painting Gallery", description: "A fresh coat of paint or new siding can dramatically improve your home's curb appeal and value. Check out these transformations.", images: ["https://images.unsplash.com/photo-1605276374104-5de67d608548?q=80&w=2070&auto=format&fit=crop", "https://images.unsplash.com/photo-1600585152220-90363fe7e115?q=80&w=2070&auto=format&fit=crop", "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?q=80&w=1974&auto=format&fit=crop", "https://images.unsplash.com/photo-1570129477492-45c003edd2e0?q=80&w=2070&auto=format&fit=crop"] }
-        };
-        window.openServiceModal = k => { const d = serviceData[k]; d && (modalTitle.textContent = d.title, modalDescription.textContent = d.description, modalGallery.innerHTML = d.images.map(s => `<img src="${s}" alt="${d.title} example" class="w-full h-48 object-cover rounded-lg">`).join(''), serviceModal.classList.add('active')) };
-        window.closeModal = () => serviceModal.classList.remove('active');
-        serviceModal.addEventListener('click', e => { e.target === serviceModal && closeModal() });
-
-        // --- CHAT LOGIC ---
-        const addMessage = (content, sender, isHTML = false) => {
-            const bubble = document.createElement('div');
-            bubble.className = `chat-bubble chat-bubble-${sender}`;
-            if (isHTML) {
-                bubble.innerHTML = content;
-            } else {
-                bubble.textContent = content;
-            }
-            chatContainer.appendChild(bubble);
-            chatContainer.scrollTop = chatContainer.scrollHeight;
-        };
-        const showTypingIndicator = () => { if (document.getElementById('typing-indicator')) return; const i = `<div id="typing-indicator" class="chat-bubble chat-bubble-ai typing-indicator"><span></span><span></span><span></span></div>`; chatContainer.insertAdjacentHTML('beforeend', i), chatContainer.scrollTop = chatContainer.scrollHeight };
-        const hideTypingIndicator = () => document.getElementById('typing-indicator')?.remove();
-        const setInputDisabled = (disabled) => { isWaitingForResponse = disabled, chatInput.disabled = disabled, sendBtn.disabled = disabled, chatInput.placeholder = disabled ? "Waitin' on a reply..." : "Type your message here..." };
-
-        const processAndSubmitForm = () => {
-            addMessage("Alright, I'm sending this over to the team now. Stand by...", 'ai');
-            setInputDisabled(true);
-            hbspt.forms.create({
-                region: "na1", portalId: HUBSPOT_PORTAL_ID, formId: HUBSPOT_FORM_ID,
-                target: '#hubspot-form-container',
-                onFormReady: function($form) {
-                    $form.find('input[name="firstname"]').val(projectData.firstname).change();
-                    $form.find('input[name="lastname"]').val(projectData.lastname).change();
-                    $form.find('input[name="email"]').val(projectData.email).change();
-                    $form.find('input[name="phone"]').val(projectData.phone).change();
-                    $form.find('select[name="property_type"]').val(projectData.property_type).change();
-                    $form.find('select[name="service_type_requested"]').val(projectData.service_type_requested).change();
-                    $form.find('select[name="current_roof_condition"]').val(projectData.current_roof_condition).change();
-                    $form.find('input[name="address"]').val(projectData.address).change();
-                    $form.find('input[name="specific_lead_source"]').val(projectData.specific_lead_source).change();
-                    $form.find('input[name="preferred_inspection_project_start_date"]').val(projectData.preferred_inspection_project_start_date).change();
-                    $form.find('select[name="lead_segmentation_qualification"]').val(projectData.lead_segmentation_qualification).change();
-                    $form.submit();
-                },
-                onFormSubmitted: function() {
-                    isFormSubmitted = true;
-                    setTimeout(() => {
-                        const successMessage = `Got it, ${projectData.firstname}! Your project plan is in. We're reviewin' it now and one of our specialists from the Dallas team will give you a call shortly. We appreciate your business!`;
-                        addMessage(successMessage, 'ai');
-                        setInputDisabled(true);
-                        chatInput.placeholder = "Thank you! We'll be in touch.";
-                    }, 1000);
-                }
-            });
-        };
-        
-        const callAIAssistant = async (userInput) => {
-            if (isWaitingForResponse || isFormSubmitted) return;
-            setInputDisabled(true);
-            addMessage(userInput, 'user');
-            showTypingIndicator();
-            try {
-                // CORRECTED: The system prompt object is removed from here.
-                const currentConversation = conversationHistory;
-                const response = await fetch(API_BACKEND_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ prompt: userInput, conversationHistory: currentConversation }) });
-                
-                hideTypingIndicator();
-                if (!response.ok) throw new Error(`Server Error: ${response.status}`);
-
-                const data = await response.json();
-                let aiResponse = data.text;
-                conversationHistory.push({ role: 'user', parts: [{ text: userInput }] });
-                conversationHistory.push({ role: 'model', parts: [{ text: aiResponse }] });
-                
-                try {
-                    if (aiResponse.trim().startsWith('{') && aiResponse.trim().endsWith('}')) {
-                        projectData = JSON.parse(aiResponse);
-                        if(projectData.firstname && projectData.email && projectData.phone) {
-                            const confirmationMsg = `Alright, ${projectData.firstname}, I've got all the details for your project plan. Just to confirm, I'll be sending this to our Dallas team. Sound good?`;
-                            const actionsHTML = `<div class="chat-actions"><button class="chat-btn" onclick="window.confirmProjectSubmission()">Yes, Send Plan</button><button class="chat-btn" onclick="window.cancelProjectSubmission()">No, Hold On</button></div>`;
-                            addMessage(confirmationMsg + actionsHTML, 'ai', true);
-                            setInputDisabled(true);
-                            return;
-                        }
-                    }
-                } catch (e) { /* Not a JSON object, continue. */ }
-                
-                addMessage(aiResponse, 'ai', true); // Render response as HTML to process buttons/links
-                setInputDisabled(false);
-                chatInput.focus();
-
-            } catch (error) {
-                hideTypingIndicator();
-                console.error("Error calling backend:", error);
-                addMessage("Apologies, it seems my connection to the main office just fizzled out. Could you try that again in a moment?", 'ai');
-                setInputDisabled(false);
-            }
-        };
-
-        const handleUserInput = () => {
-            const userInput = chatInput.value.trim();
-            if (!userInput || isWaitingForResponse) return;
-            chatInput.value = '';
-            callAIAssistant(userInput);
-        };
-        
-        window.confirmProjectSubmission = () => { document.querySelector('.chat-actions').remove(); processAndSubmitForm() };
-        window.cancelProjectSubmission = () => { document.querySelector('.chat-actions').remove(); addMessage("No problem! What would you like to change or add?", 'ai'); setInputDisabled(false); chatInput.focus() };
-        sendBtn.addEventListener('click', handleUserInput);
-        chatInput.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); handleUserInput() } });
-        
-        // --- INITIALIZATION ---
-        callAIAssistant("Start the conversation");
-    });
-    </script>
-</body>
-</html>
+@app.get("/")
+def read_root():
+    return {"status": "FDG Constructions AI Backend is live and running."}
