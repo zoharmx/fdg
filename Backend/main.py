@@ -9,7 +9,7 @@ load_dotenv()
 
 app = FastAPI(
     title="FDG Constructions AI Backend",
-    version="1.1.0"
+    version="3.0.0" # Final Version
 )
 
 # --- Configuración de CORS ---
@@ -35,8 +35,7 @@ try:
 except Exception as e:
     print(f"CRITICAL ERROR: Could not configure Gemini API. {e}")
 
-# --- Instrucciones del Sistema para la IA ---
-# Las instrucciones ahora viven de forma segura en el backend.
+# --- INSTRUCCIONES DEL SISTEMA (Rol: Recolector de Datos) ---
 SYSTEM_INSTRUCTIONS = """You are "Project Pal," a friendly, helpful, and slightly informal AI assistant for FDG Constructions in Dallas, TX. Your persona should reflect a Dallas local: confident, friendly, efficient. Your primary goal is to conduct a conversational "intake interview" to gather all necessary information for a project quote.
 
 **Core Mission:** Collect the data for the following JSON keys, IN ORDER, asking one question at a time. Do not move to the next question until you have a reasonable answer for the current one.
@@ -61,16 +60,15 @@ SYSTEM_INSTRUCTIONS = """You are "Project Pal," a friendly, helpful, and slightl
 Start the conversation with the user now.
 """
 
-# Define el modelo de datos para la solicitud que llega del frontend
-class PromptRequest(BaseModel):
-    prompt: str
-    conversationHistory: list
-
-# Inicializa el modelo de IA una sola vez con las instrucciones del sistema
+# Inicializa el modelo de IA
 model = genai.GenerativeModel(
     'gemini-1.5-pro',
     system_instruction=SYSTEM_INSTRUCTIONS
 )
+
+class PromptRequest(BaseModel):
+    prompt: str
+    conversationHistory: list
 
 @app.post("/api/generate")
 async def generate_content_route(request: PromptRequest):
@@ -78,12 +76,8 @@ async def generate_content_route(request: PromptRequest):
         raise HTTPException(status_code=400, detail="No prompt provided.")
 
     try:
-        # El historial de la conversación se pasa directamente al modelo
-        # para que cada nueva respuesta tenga el contexto completo.
-        # Ya no necesitamos agregar las instrucciones aquí.
         history = request.conversationHistory + [{'role': 'user', 'parts': [request.prompt]}]
         response = model.generate_content(history)
-        
         return {"text": response.text}
     except Exception as e:
         print(f"Error during Gemini content generation: {e}")
@@ -91,4 +85,4 @@ async def generate_content_route(request: PromptRequest):
 
 @app.get("/")
 def read_root():
-    return {"status": "FDG Constructions AI Backend is live and running."}
+    return {"status": "FDG Constructions AI Backend v3.0 is live and running."}
