@@ -13,24 +13,16 @@
         :root { --primary-yellow: #FCD34D; --dark-bg: #0A0A0A; --card-bg: #131313; --border-color: #262626; --text-primary: #F5F5F5; --text-secondary: #A3A3A3; }
         html { scroll-behavior: smooth; }
         body { font-family: 'Inter', sans-serif; background-color: var(--dark-bg); color: var(--text-primary); overflow-x: hidden; }
-        
-        /* Animations & Transitions */
         .fade-in-section { opacity: 0; transform: translateY(30px); transition: opacity 0.8s ease-out, transform 0.8s ease-out; }
         .fade-in-section.is-visible { opacity: 1; transform: translateY(0); }
-
-        /* Buttons */
         .btn { padding: 14px 28px; border-radius: 12px; font-weight: 700; transition: all 0.3s ease; display: inline-flex; align-items: center; justify-content: center; gap: 0.75rem; cursor: pointer; text-decoration: none; }
         .btn-primary { background: linear-gradient(135deg, var(--primary-yellow), #FBBF24); color: var(--dark-bg); box-shadow: 0 4px 20px rgba(252, 211, 77, 0.2); }
         .btn-primary:hover { transform: translateY(-4px) scale(1.03); box-shadow: 0 10px 30px rgba(252, 211, 77, 0.3); }
         .btn-secondary { background-color: transparent; border: 2px solid var(--primary-yellow); color: var(--primary-yellow); }
         .btn-secondary:hover { background-color: var(--primary-yellow); color: var(--dark-bg); }
-
-        /* Typography & Layout */
         .section-title { font-size: clamp(2.2rem, 5vw, 3rem); font-weight: 800; text-align: center; margin-bottom: 1rem; background: linear-gradient(135deg, var(--text-primary), var(--text-secondary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         .section-subtitle { text-align: center; color: var(--text-secondary); font-size: 1.125rem; max-width: 60ch; margin: 0 auto 4rem auto; }
         .highlight-yellow { color: var(--primary-yellow); }
-
-        /* Chat Styles */
         .chat-container { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 16px; padding: 24px; height: 600px; overflow-y: auto; display: flex; flex-direction: column; gap: 16px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); }
         @keyframes slide-in-left { from { opacity: 0; transform: translateX(-20px); } to { opacity: 1; transform: translateX(0); } }
         @keyframes slide-in-right { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
@@ -43,15 +35,11 @@
         .typing-indicator { display: flex; align-items: center; gap: 5px; padding: 16px 20px; }
         .typing-indicator span { height: 8px; width: 8px; background-color: #737373; border-radius: 50%; animation: bounce 1.4s infinite ease-in-out both; }
         .typing-indicator span:nth-child(1) { animation-delay: -0.32s; } @keyframes bounce { 0%, 80%, 100% { transform: scale(0); } 40% { transform: scale(1.0); } }
-        
-        /* Modal Styles */
         .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(5px); display: flex; align-items: center; justify-content: center; z-index: 1000; opacity: 0; visibility: hidden; transition: opacity 0.3s ease, visibility 0.3s ease; }
         .modal-overlay.active { opacity: 1; visibility: visible; }
         .modal-content { background: var(--card-bg); padding: 2rem; border-radius: 16px; border: 1px solid var(--border-color); max-width: 600px; width: 90%; transform: scale(0.95); transition: transform 0.3s ease; position: relative; }
         .modal-overlay.active .modal-content { transform: scale(1); }
         .modal-close { position: absolute; top: 1rem; right: 1rem; background: none; border: none; color: var(--text-secondary); font-size: 1.5rem; cursor: pointer; }
-
-        /* HubSpot Manual Form Styles */
         #manual-form-container { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 16px; padding: 2rem; }
         #manual-form-container .hs-form-field label { color: var(--text-primary) !important; font-weight: 600 !important; margin-bottom: 0.5rem; display: block; }
         #manual-form-container .hs-input, #manual-form-container .hs-select { background-color: var(--dark-bg) !important; border: 2px solid var(--border-color) !important; color: var(--text-primary) !important; width: 100% !important; border-radius: 8px !important; padding: 12px !important; }
@@ -64,130 +52,33 @@
 
     <header class="sticky top-0 z-50 bg-dark-bg/80 backdrop-blur-lg border-b border-border-color">
         <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-20">
-            <div class="flex-shrink-0">
-                <a href="#" class="flex items-center gap-3">
-                    <img src="https://assets.zyrosite.com/ALpbKwnbRlSMvo8k/fdg-YD0wEDy1DOtWNaNj.png" alt="FDG Constructions Logo" class="h-16 w-auto">
-                </a>
-            </div>
-            <div class="hidden md:flex items-center space-x-8">
-                <a href="#services" class="text-text-secondary hover:text-primary-yellow transition">Services</a>
-                <a href="#portfolio" class="text-text-secondary hover:text-primary-yellow transition">Our Work</a>
-                <a href="#testimonials" class="text-text-secondary hover:text-primary-yellow transition">Testimonials</a>
-                <a href="#ai-planner" class="text-text-secondary hover:text-primary-yellow transition">Get Quote</a>
-            </div>
-            <div class="flex items-center gap-4">
-                <a href="tel:+14304445162" class="hidden sm:flex items-center gap-2 text-text-secondary hover:text-primary-yellow transition">
-                    <i class="fa-solid fa-phone-volume"></i>
-                    <span>+1 (430) 444-5162</span>
-                </a>
-                <a href="#ai-planner" class="btn btn-primary">
-                    <i class="fa-solid fa-brain"></i>
-                    <span>Start with AI</span>
-                </a>
-            </div>
+            <div class="flex-shrink-0"><a href="#" class="flex items-center gap-3"><img src="https://assets.zyrosite.com/ALpbKwnbRlSMvo8k/fdg-YD0wEDy1DOtWNaNj.png" alt="FDG Constructions Logo" class="h-16 w-auto"></a></div>
+            <div class="hidden md:flex items-center space-x-8"><a href="#services" class="text-text-secondary hover:text-primary-yellow transition">Services</a><a href="#portfolio" class="text-text-secondary hover:text-primary-yellow transition">Our Work</a><a href="#testimonials" class="text-text-secondary hover:text-primary-yellow transition">Testimonials</a><a href="#ai-planner" class="text-text-secondary hover:text-primary-yellow transition">Get Quote</a></div>
+            <div class="flex items-center gap-4"><a href="tel:+14304445162" class="hidden sm:flex items-center gap-2 text-text-secondary hover:text-primary-yellow transition"><i class="fa-solid fa-phone-volume"></i><span>+1 (430) 444-5162</span></a><a href="#ai-planner" class="btn btn-primary"><i class="fa-solid fa-brain"></i><span>Start with AI</span></a></div>
         </nav>
     </header>
 
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        
-        <section class="text-center py-24 md:py-32 fade-in-section">
-            <h1 class="text-4xl md:text-6xl font-black mb-4 leading-tight">Buildin' a <span class="highlight-yellow">Better Dallas</span>, One Project at a Time.</h1>
-            <p class="text-xl text-text-secondary mb-10 max-w-3xl mx-auto">Y'all have a vision? We've got the tools, the team, and the tech to make it happen. Let our AI Project Planner get your free, no-nonsense quote started in minutes.</p>
-            <a href="#ai-planner" class="btn btn-primary text-lg"><i class="fa-solid fa-comments"></i> Chat with our AI</a>
-        </section>
-
-        <section id="stats" class="py-20 grid grid-cols-2 md:grid-cols-4 gap-8 text-center fade-in-section">
-            <div>
-                <p class="text-5xl font-bold highlight-yellow" data-target="776">0</p>
-                <p class="text-text-secondary mt-2">Projects Completed</p>
-            </div>
-            <div>
-                <p class="text-5xl font-bold highlight-yellow"><span data-target="97">0</span>%</p>
-                <p class="text-text-secondary mt-2">Satisfaction Rate</p>
-            </div>
-            <div>
-                <p class="text-5xl font-bold highlight-yellow" data-target="15">0</p>
-                <p class="text-text-secondary mt-2">Years Experience</p>
-            </div>
-            <div>
-                <p class="text-5xl font-bold highlight-yellow" data-target="52">0</p>
-                <p class="text-text-secondary mt-2">Expert Contractors</p>
-            </div>
-        </section>
-
+        <section class="text-center py-24 md:py-32 fade-in-section"><h1 class="text-4xl md:text-6xl font-black mb-4 leading-tight">Buildin' a <span class="highlight-yellow">Better Dallas</span>, One Project at a Time.</h1><p class="text-xl text-text-secondary mb-10 max-w-3xl mx-auto">Y'all have a vision? We've got the tools, the team, and the tech to make it happen. Let our AI Project Planner get your free, no-nonsense quote started in minutes.</p><a href="#ai-planner" class="btn btn-primary text-lg"><i class="fa-solid fa-comments"></i> Chat with our AI</a></section>
+        <section id="stats" class="py-20 grid grid-cols-2 md:grid-cols-4 gap-8 text-center fade-in-section"><div><p class="text-5xl font-bold highlight-yellow" data-target="776">0</p><p class="text-text-secondary mt-2">Projects Completed</p></div><div><p class="text-5xl font-bold highlight-yellow"><span data-target="97">0</span>%</p><p class="text-text-secondary mt-2">Satisfaction Rate</p></div><div><p class="text-5xl font-bold highlight-yellow" data-target="15">0</p><p class="text-text-secondary mt-2">Years Experience</p></div><div><p class="text-5xl font-bold highlight-yellow" data-target="52">0</p><p class="text-text-secondary mt-2">Expert Contractors</p></div></section>
         <hr class="border-border-color my-24">
-
-        <section id="services" class="py-20 fade-in-section">
-            <h2 class="section-title">Our Construction Services</h2>
-            <p class="section-subtitle">From foundation to finish, we're your trusted partner in Dallas for a wide range of construction needs.</p>
-            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-                <div class="bg-card-bg p-8 rounded-lg border border-border-color"><i class="fa-solid fa-house-damage text-3xl highlight-yellow mb-4"></i><h3 class="text-xl font-bold mb-2">Roofing Construction</h3><p class="text-text-secondary">Specializing in roof repair, replacement, and new installations. We handle everything from storm damage insurance claims to preventative maintenance.</p></div>
-                <div class="bg-card-bg p-8 rounded-lg border border-border-color"><i class="fa-solid fa-paint-roller text-3xl highlight-yellow mb-4"></i><h3 class="text-xl font-bold mb-2">Interior & Exterior Painting</h3><p class="text-text-secondary">A fresh coat of paint can transform your property. Our professional painters deliver flawless finishes for homes and businesses.</p></div>
-                <div class="bg-card-bg p-8 rounded-lg border border-border-color"><i class="fa-solid fa-hammer text-3xl highlight-yellow mb-4"></i><h3 class="text-xl font-bold mb-2">General Remodeling</h3><p class="text-text-secondary">Kitchens, bathrooms, or whole-home renovations. We bring your remodeling dreams to life with quality craftsmanship.</p></div>
-            </div>
-        </section>
-
-        <section id="portfolio" class="py-20 fade-in-section">
-            <h2 class="section-title">Featured Work in DFW</h2>
-            <p class="section-subtitle">We let our work speak for itself. Here are a few examples of projects we've proudly completed around the Dallas area.</p>
-            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-                <div class="bg-card-bg rounded-lg overflow-hidden group"><img src="https://images.pexels.com/photos/2219024/pexels-photo-2219024.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1" alt="Roof Replacement in Plano" class="w-full h-60 object-cover group-hover:scale-105 transition-transform duration-300"><div class="p-6"><h3 class="text-xl font-bold">Full Roof Replacement</h3><p class="text-text-secondary mb-4">Plano, TX</p><button class="btn btn-secondary w-full" data-modal-target="modal-1">View Details</button></div></div>
-                <div class="bg-card-bg rounded-lg overflow-hidden group"><img src="https://images.pexels.com/photos/1123999/pexels-photo-1123999.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1" alt="Commercial Remodel in Frisco" class="w-full h-60 object-cover group-hover:scale-105 transition-transform duration-300"><div class="p-6"><h3 class="text-xl font-bold">Commercial Remodel</h3><p class="text-text-secondary mb-4">Frisco, TX</p><button class="btn btn-secondary w-full" data-modal-target="modal-2">View Details</button></div></div>
-                <div class="bg-card-bg rounded-lg overflow-hidden group"><img src="https://images.pexels.com/photos/209266/pexels-photo-209266.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1" alt="Storm Damage Repair in Highland Park" class="w-full h-60 object-cover group-hover:scale-105 transition-transform duration-300"><div class="p-6"><h3 class="text-xl font-bold">Hail Damage Repair</h3><p class="text-text-secondary mb-4">Highland Park, Dallas</p><button class="btn btn-secondary w-full" data-modal-target="modal-3">View Details</button></div></div>
-            </div>
-        </section>
-
-        <section id="testimonials" class="py-20 fade-in-section">
-            <h2 class="section-title">What Our Clients Say</h2>
-            <p class="section-subtitle">Real stories from real homeowners and businesses in Dallas.</p>
-            <div class="grid md:grid-cols-2 gap-8">
-                <div class="bg-card-bg p-8 rounded-lg border border-border-color"><p class="text-text-secondary italic mb-4">"After the last hail storm, I thought we were in for a nightmare. FDG Constructions handled everything with our insurance and had our new roof on in two days. Unbelievable service."</p><p class="font-bold text-primary-yellow">- Mark & Susan T.</p><p class="text-sm text-text-secondary">Preston Hollow, Dallas</p></div>
-                <div class="bg-card-bg p-8 rounded-lg border border-border-color"><p class="text-text-secondary italic mb-4">"We hired FDG for a full commercial office remodel. Their attention to detail and communication was top-notch. They finished on time and on budget. Highly recommend."</p><p class="font-bold text-primary-yellow">- David Chen, CEO of Innovatech</p><p class="text-sm text-text-secondary">Richardson, TX</p></div>
-            </div>
-        </section>
-
+        <section id="services" class="py-20 fade-in-section"><h2 class="section-title">Our Construction Services</h2><p class="section-subtitle">From foundation to finish, we're your trusted partner in Dallas for a wide range of construction needs.</p><div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8"><div class="bg-card-bg p-8 rounded-lg border border-border-color"><i class="fa-solid fa-house-damage text-3xl highlight-yellow mb-4"></i><h3 class="text-xl font-bold mb-2">Roofing Construction</h3><p class="text-text-secondary">Specializing in roof repair, replacement, and new installations. We handle everything from storm damage insurance claims to preventative maintenance.</p></div><div class="bg-card-bg p-8 rounded-lg border border-border-color"><i class="fa-solid fa-paint-roller text-3xl highlight-yellow mb-4"></i><h3 class="text-xl font-bold mb-2">Interior & Exterior Painting</h3><p class="text-text-secondary">A fresh coat of paint can transform your property. Our professional painters deliver flawless finishes for homes and businesses.</p></div><div class="bg-card-bg p-8 rounded-lg border border-border-color"><i class="fa-solid fa-hammer text-3xl highlight-yellow mb-4"></i><h3 class="text-xl font-bold mb-2">General Remodeling</h3><p class="text-text-secondary">Kitchens, bathrooms, or whole-home renovations. We bring your remodeling dreams to life with quality craftsmanship.</p></div></div></section>
+        <section id="portfolio" class="py-20 fade-in-section"><h2 class="section-title">Featured Work in DFW</h2><p class="section-subtitle">We let our work speak for itself. Here are a few examples of projects we've proudly completed around the Dallas area.</p><div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8"><div class="bg-card-bg rounded-lg overflow-hidden group"><img src="https://images.pexels.com/photos/2219024/pexels-photo-2219024.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1" alt="Roof Replacement in Plano" class="w-full h-60 object-cover group-hover:scale-105 transition-transform duration-300"><div class="p-6"><h3 class="text-xl font-bold">Full Roof Replacement</h3><p class="text-text-secondary mb-4">Plano, TX</p><button class="btn btn-secondary w-full" data-modal-target="modal-1">View Details</button></div></div><div class="bg-card-bg rounded-lg overflow-hidden group"><img src="https://images.pexels.com/photos/1123999/pexels-photo-1123999.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1" alt="Commercial Remodel in Frisco" class="w-full h-60 object-cover group-hover:scale-105 transition-transform duration-300"><div class="p-6"><h3 class="text-xl font-bold">Commercial Remodel</h3><p class="text-text-secondary mb-4">Frisco, TX</p><button class="btn btn-secondary w-full" data-modal-target="modal-2">View Details</button></div></div><div class="bg-card-bg rounded-lg overflow-hidden group"><img src="https://images.pexels.com/photos/209266/pexels-photo-209266.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1" alt="Storm Damage Repair in Highland Park" class="w-full h-60 object-cover group-hover:scale-105 transition-transform duration-300"><div class="p-6"><h3 class="text-xl font-bold">Hail Damage Repair</h3><p class="text-text-secondary mb-4">Highland Park, Dallas</p><button class="btn btn-secondary w-full" data-modal-target="modal-3">View Details</button></div></div></div></section>
+        <section id="testimonials" class="py-20 fade-in-section"><h2 class="section-title">What Our Clients Say</h2><p class="section-subtitle">Real stories from real homeowners and businesses in Dallas.</p><div class="grid md:grid-cols-2 gap-8"><div class="bg-card-bg p-8 rounded-lg border border-border-color"><p class="text-text-secondary italic mb-4">"After the last hail storm, I thought we were in for a nightmare. FDG Constructions handled everything with our insurance and had our new roof on in two days. Unbelievable service."</p><p class="font-bold text-primary-yellow">- Mark & Susan T.</p><p class="text-sm text-text-secondary">Preston Hollow, Dallas</p></div><div class="bg-card-bg p-8 rounded-lg border border-border-color"><p class="text-text-secondary italic mb-4">"We hired FDG for a full commercial office remodel. Their attention to detail and communication was top-notch. They finished on time and on budget. Highly recommend."</p><p class="font-bold text-primary-yellow">- David Chen, CEO of Innovatech</p><p class="text-sm text-text-secondary">Richardson, TX</p></div></div></section>
         <hr class="border-border-color my-24">
-
-        <section id="ai-planner" class="py-20 fade-in-section">
-            <div class="text-center mb-12">
-                <h2 class="section-title">AI-Powered Project Planner</h2>
-                <p class="section-subtitle">Let's get this done. Our AI assistant will ask you a few simple questions to gather all the details for an accurate quote. It's the smartest way to get started.</p>
-            </div>
-            <div class="max-w-4xl mx-auto">
-                <div class="chat-container" id="chat-container"></div>
-                <div id="chat-input-area" class="chat-input-container">
-                    <input type="text" id="chat-input" placeholder="Just say 'hi' to get started..." class="chat-input" autocomplete="off">
-                    <button id="send-chat-btn" class="btn btn-primary" aria-label="Send Message"><i class="fa-solid fa-paper-plane"></i></button>
-                </div>
-                <div id="hubspot-form-container-invisible" class="hidden" aria-hidden="true"></div>
-            </div>
-        </section>
-
-        <section id="manual-form-section" class="py-20 fade-in-section">
-            <div class="text-center mb-12">
-                <h2 class="section-title">Or Use Our Standard Form</h2>
-                <p class="section-subtitle">If you prefer, you can send us your project details using the classic form below.</p>
-            </div>
-            <div id="manual-form-container" class="max-w-4xl mx-auto"></div>
-        </section>
-
+        <section id="ai-planner" class="py-20 fade-in-section"><div class="text-center mb-12"><h2 class="section-title">AI-Powered Project Planner</h2><p class="section-subtitle">Let's get this done. Our AI assistant will ask you a few simple questions to gather all the details for an accurate quote. It's the smartest way to get started.</p></div><div class="max-w-4xl mx-auto"><div class="chat-container" id="chat-container"></div><div id="chat-input-area" class="chat-input-container"><input type="text" id="chat-input" placeholder="Just say 'hi' to get started..." class="chat-input" autocomplete="off"><button id="send-chat-btn" class="btn btn-primary" aria-label="Send Message"><i class="fa-solid fa-paper-plane"></i></button></div><div id="hubspot-form-container-invisible" class="hidden" aria-hidden="true"></div></div></section>
+        <section id="manual-form-section" class="py-20 fade-in-section"><div class="text-center mb-12"><h2 class="section-title">Or Use Our Standard Form</h2><p class="section-subtitle">If you prefer, you can send us your project details using the classic form below.</p></div><div id="manual-form-container" class="max-w-4xl mx-auto"></div></section>
     </main>
 
     <footer class="bg-card-bg border-t border-border-color mt-24 py-16">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-text-secondary">
-            <img src="https://assets.zyrosite.com/ALpbKwnbRlSMvo8k/fdg-YD0wEDy1DOtWNaNj.png" alt="FDG Constructions Logo" class="h-20 w-auto mx-auto mb-6">
-            <p class="font-bold text-text-primary text-lg">FDG Constructions - Your Vision, Our Construction.</p>
-            <p class="mt-4">Serving the greater Dallas-Fort Worth Metroplex with pride and professionalism.</p>
-            <div class="flex justify-center items-center gap-6 my-6"><a href="tel:+14304445162" class="hover:text-primary-yellow transition"><i class="fa-solid fa-phone mr-2"></i>+1 (430) 444-5162</a><a href="mailto:contact@fdgconstructions.site" class="hover:text-primary-yellow transition"><i class="fa-solid fa-envelope mr-2"></i>contact@fdgconstructions.site</a></div>
-            <div class="flex justify-center items-center gap-6 my-6"><a href="https://www.facebook.com/profile.php?id=61577760321860" target="_blank" rel="noopener noreferrer" class="text-2xl hover:text-primary-yellow transition"><i class="fa-brands fa-facebook"></i></a></div>
-            <p class="text-sm mt-8">© <span id="year"></span> FDG Constructions. All Rights Reserved.</p>
-        </div>
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-text-secondary"><img src="https://assets.zyrosite.com/ALpbKwnbRlSMvo8k/fdg-YD0wEDy1DOtWNaNj.png" alt="FDG Constructions Logo" class="h-20 w-auto mx-auto mb-6"><p class="font-bold text-text-primary text-lg">FDG Constructions - Your Vision, Our Construction.</p><p class="mt-4">Serving the greater Dallas-Fort Worth Metroplex with pride and professionalism.</p><div class="flex justify-center items-center gap-6 my-6"><a href="tel:+14304445162" class="hover:text-primary-yellow transition"><i class="fa-solid fa-phone mr-2"></i>+1 (430) 444-5162</a><a href="mailto:contact@fdgconstructions.site" class="hover:text-primary-yellow transition"><i class="fa-solid fa-envelope mr-2"></i>contact@fdgconstructions.site</a></div><div class="flex justify-center items-center gap-6 my-6"><a href="https://www.facebook.com/profile.php?id=61577760321860" target="_blank" rel="noopener noreferrer" class="text-2xl hover:text-primary-yellow transition"><i class="fa-brands fa-facebook"></i></a></div><p class="text-sm mt-8">© <span id="year"></span> FDG Constructions. All Rights Reserved.</p></div>
     </footer>
 
     <div id="modal-1" class="modal-overlay"><div class="modal-content"><button class="modal-close">×</button><img src="https://images.pexels.com/photos/2219024/pexels-photo-2219024.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1" alt="Roof Replacement in Plano" class="w-full h-64 object-cover rounded-lg mb-4"><h3 class="text-2xl font-bold highlight-yellow">Full Roof Replacement - Plano, TX</h3><p class="text-text-secondary mt-4">This project involved a complete tear-off of old, worn-out shingles and installation of new, high-performance architectural shingles. We also replaced the decking and ensured proper ventilation, providing the homeowner with a 30-year warranty and peace of mind.</p></div></div>
     <div id="modal-2" class="modal-overlay"><div class="modal-content"><button class="modal-close">×</button><img src="https://images.pexels.com/photos/1123999/pexels-photo-1123999.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1" alt="Commercial Remodel in Frisco" class="w-full h-64 object-cover rounded-lg mb-4"><h3 class="text-2xl font-bold highlight-yellow">Commercial Remodel - Frisco, TX</h3><p class="text-text-secondary mt-4">We transformed this outdated retail space into a modern, inviting storefront. The project included new flooring, custom lighting, interior and exterior painting, and updated ADA-compliant restrooms. The client reported a significant increase in foot traffic post-renovation.</p></div></div>
     <div id="modal-3" class="modal-overlay"><div class="modal-content"><button class="modal-close">×</button><img src="https://images.pexels.com/photos/209266/pexels-photo-209266.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1" alt="Storm Damage Repair in Highland Park" class="w-full h-64 object-cover rounded-lg mb-4"><h3 class="text-2xl font-bold highlight-yellow">Hail Damage Repair - Highland Park</h3><p class="text-text-secondary mt-4">Following a severe hailstorm, we conducted an emergency inspection and worked directly with the homeowner's insurance adjuster. The project included replacing damaged shingles, gutters, and window screens, restoring the property to its pre-storm condition quickly and efficiently.</p></div></div>
 
+    <!-- CÓDIGO JAVASCRIPT COMPLETO Y FUNCIONAL -->
     <script>
     document.addEventListener('DOMContentLoaded', () => {
 
@@ -209,20 +100,140 @@
         let isFormSubmitted = false;
         
         // --- UI & CORE LOGIC ---
-        const addMessage = (content, sender, isHTML = false) => { /* ... (código sin cambios) ... */ };
-        const showTypingIndicator = () => { /* ... (código sin cambios) ... */ };
+        const addMessage = (content, sender, isHTML = false) => {
+            const bubble = document.createElement('div');
+            bubble.className = `chat-bubble chat-bubble-${sender}`;
+            if (isHTML) {
+                bubble.innerHTML = content.replace(/\n/g, '<br>');
+            } else {
+                bubble.textContent = content;
+            }
+            chatContainer.appendChild(bubble);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        };
+
+        const showTypingIndicator = () => {
+            if (document.getElementById('typing-indicator')) return;
+            const indicatorHTML = `<div id="typing-indicator" class="chat-bubble chat-bubble-ai typing-indicator"><span></span><span></span><span></span></div>`;
+            chatContainer.insertAdjacentHTML('beforeend', indicatorHTML);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        };
+        
         const hideTypingIndicator = () => document.getElementById('typing-indicator')?.remove();
-        const setInputDisabled = (disabled, placeholder = "Type your reply...") => { /* ... (código sin cambios) ... */ };
-        const handleUserInput = () => { /* ... (código sin cambios) ... */ };
-        const processAndSubmitToHubSpot = () => { /* ... (código sin cambios) ... */ };
-        const callAIAssistant = async (userInput) => { /* ... (código sin cambios) ... */ };
+        
+        const setInputDisabled = (disabled, placeholder = "Type your reply...") => {
+            isWaitingForResponse = disabled;
+            chatInput.disabled = disabled;
+            sendBtn.disabled = disabled;
+            chatInput.placeholder = placeholder;
+            sendBtn.style.cursor = disabled ? 'not-allowed' : 'pointer';
+            sendBtn.style.opacity = disabled ? 0.6 : 1;
+        };
+
+        const handleUserInput = () => {
+            const userInput = chatInput.value.trim();
+            if (!userInput || isWaitingForResponse) return;
+            
+            addMessage(userInput, 'user');
+            conversationHistory.push({ role: 'user', parts: [{ text: userInput }] });
+            chatInput.value = '';
+            
+            callAIAssistant(userInput);
+        };
+
+        // --- HUBSPOT INTEGRATION LOGIC ---
+        const processAndSubmitToHubSpot = () => {
+            addMessage("Alright, I'm sending this over to the team now. One moment...", 'ai');
+            setInputDisabled(true, "Submitting your project...");
+
+            hbspt.forms.create({
+                region: "na1",
+                portalId: HUBSPOT_PORTAL_ID,
+                formId: HUBSPOT_FORM_ID,
+                target: '#hubspot-form-container-invisible',
+                onFormReady: function($form) {
+                    $form.find('input[name="firstname"]').val(projectData.firstname).change();
+                    $form.find('input[name="lastname"]').val(projectData.lastname).change();
+                    $form.find('input[name="email"]').val(projectData.email).change();
+                    $form.find('input[name="phone"]').val(projectData.phone).change();
+                    $form.find('select[name="property_type"]').val(projectData.property_type).change();
+                    $form.find('select[name="service_type_requested"]').val(projectData.service_type_requested).change();
+                    $form.find('select[name="current_roof_condition"]').val(projectData.current_roof_condition).change();
+                    $form.find('input[name="address"]').val(projectData.address).change();
+                    $form.find('input[name="specific_lead_source"]').val(projectData.specific_lead_source).change();
+                    $form.find('select[name="lead_segmentation_qualification"]').val(projectData.lead_segmentation_qualification).change();
+                    $form.find('input[name="preferred_inspection_project_start_date"]').val(projectData.preferred_inspection_project_start_date).change();
+                    $form.submit();
+                },
+                onFormSubmitted: function() {
+                    isFormSubmitted = true;
+                    setTimeout(() => {
+                        hideTypingIndicator();
+                        const successMessage = `Got it, ${projectData.firstname}! Your project plan is in. We're reviewin' it now and one of our specialists from the Dallas team will give you a call shortly. We appreciate your business!`;
+                        addMessage(successMessage, 'ai');
+                        setInputDisabled(true, "Thank you! We'll be in touch.");
+                    }, 500);
+                }
+            });
+        };
+        
+        // --- AI CHAT LOGIC ---
+        const callAIAssistant = async (userInput) => {
+            if(isFormSubmitted) return;
+            setInputDisabled(true, "Project Pal is typing...");
+            showTypingIndicator();
+            
+            try {
+                const response = await fetch(API_BACKEND_URL, { 
+                    method: 'POST', 
+                    headers: { 'Content-Type': 'application/json' }, 
+                    body: JSON.stringify({ 
+                        prompt: userInput, 
+                        conversationHistory: conversationHistory 
+                    }) 
+                });
+                
+                hideTypingIndicator();
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(`Server Error: ${response.status} - ${errorData.detail || 'Unknown error'}`);
+                }
+
+                const data = await response.json();
+                let aiResponse = data.text;
+
+                if (aiResponse.trim().startsWith('{') && aiResponse.trim().endsWith('}')) {
+                    try {
+                        projectData = JSON.parse(aiResponse);
+                        conversationHistory.push({ role: 'model', parts: [{ text: aiResponse }] });
+                        processAndSubmitToHubSpot();
+                        return; 
+                    } catch (e) {
+                        aiResponse = "Looks like I had a little trouble organizing your info. Could you please tell me the last piece of information again?";
+                    }
+                }
+
+                addMessage(aiResponse, 'ai', true);
+                conversationHistory.push({ role: 'model', parts: [{ text: aiResponse }] });
+                
+                setInputDisabled(false);
+                chatInput.focus();
+
+            } catch (error) {
+                hideTypingIndicator();
+                console.error("Error calling backend:", error);
+                addMessage("Apologies, it seems my connection to the main office just fizzled out. Could y'all try that again in a moment? If this persists, please call us directly or use the form below.", 'ai');
+                setInputDisabled(false);
+            }
+        };
         
         // --- EVENT LISTENERS ---
         sendBtn.addEventListener('click', handleUserInput);
         chatInput.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); handleUserInput() } });
         
-        // --- INICIALIZACIÓN ---
+        // --- INITIALIZATION ---
         callAIAssistant("User has opened the chat. Please provide your initial greeting.");
+
         hbspt.forms.create({
             region: "na1",
             portalId: HUBSPOT_PORTAL_ID,
@@ -230,44 +241,43 @@
             target: '#manual-form-container'
         });
 
-        // *** CÓDIGO RESTAURADO Y CORREGIDO ***
         // --- DYNAMIC CONTENT SCRIPTS ---
-        // Counter animation
         const counters = document.querySelectorAll('[data-target]');
         const animateCounter = (counter) => {
             const target = +counter.getAttribute('data-target');
-            const duration = 2000; // 2 seconds
+            const duration = 2000;
             const stepTime = Math.abs(Math.floor(duration / target));
             let current = 0;
             const timer = setInterval(() => {
                 current += 1;
-                counter.innerText = current;
                 if (current >= target) {
-                    counter.innerText = target; // Ensure it ends on the exact number
+                    current = target;
                     clearInterval(timer);
                 }
-            }, stepTime > 0 ? stepTime : 1); // Prevent stepTime from being 0
+                // Handle span case for percentage
+                if(counter.querySelector('span')) {
+                    counter.querySelector('span').innerText = current;
+                } else {
+                    counter.innerText = current;
+                }
+            }, stepTime > 0 ? stepTime : 1);
         };
 
-        // Intersection Observer for animations
-        const observer = new IntersectionObserver((entries, observer) => {
+        const observer = new IntersectionObserver((entries, obs) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
                     entry.target.classList.add('is-visible');
-                    // If the element is a counter, start its animation
-                    if (entry.target.hasAttribute('data-target')) {
-                        animateCounter(entry.target);
+                    if (entry.target.hasAttribute('data-target') || entry.target.querySelector('[data-target]')) {
+                        const counterEl = entry.target.hasAttribute('data-target') ? entry.target : entry.target.querySelector('[data-target]');
+                        animateCounter(counterEl);
                     }
-                    // Stop observing the element once it's visible
-                    observer.unobserve(entry.target);
+                    obs.unobserve(entry.target);
                 }
             });
-        }, { threshold: 0.1 }); // Trigger when 10% of the element is visible
+        }, { threshold: 0.1 });
 
-        // Observe all elements that need to fade in or be counted
         document.querySelectorAll('.fade-in-section, [data-target]').forEach(el => observer.observe(el));
 
-        // Modal logic
         const modalTriggers = document.querySelectorAll('[data-modal-target]');
         modalTriggers.forEach(trigger => {
             trigger.addEventListener('click', () => {
@@ -278,7 +288,6 @@
 
         document.querySelectorAll('.modal-overlay, .modal-close').forEach(el => {
             el.addEventListener('click', (e) => {
-                // Close only if clicking on the dark overlay itself or the close button
                 if (e.target === el) { 
                     el.closest('.modal-overlay').classList.remove('active');
                 }
